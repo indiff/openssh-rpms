@@ -110,7 +110,8 @@ Group: Applications/Internet
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
 Obsoletes: ssh
 %if %{build6x}
-PreReq: initscripts >= 5.00
+#PreReq: initscripts >= 5.00
+Requires: initscripts >= 5.00
 %else
 Requires: initscripts >= 5.20
 %endif
