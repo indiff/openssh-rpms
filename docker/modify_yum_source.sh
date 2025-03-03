@@ -43,6 +43,12 @@ function modify_el8() {
   yum makecache timer
 }
 
+function update_gcc_el8() {
+  yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++
+  scl enable gcc-toolset-14 bash
+  source /opt/rh/gcc-toolset-14/enable
+}
+
 function modify_el7() {
   sed -e 's|^mirrorlist=|#mirrorlist=|g' \
   -e "s@^#baseurl=http://mirror.centos.org/$OS_KEY/\$releasever@baseurl=${MIRROR_URL}/7.9.2009@g" \
@@ -73,6 +79,7 @@ function modify_el5() {
 case $RELEASE_VER in
   .el8)
     modify_el8
+    update_gcc_el8
     ;;
   .el7)
     modify_el7
