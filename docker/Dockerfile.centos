@@ -14,9 +14,37 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     if [ "$VERSION_NUM" = "8" ]; then \
         yum install -y perl perl-IPC-Cmd && \
         yum install -y 'dnf-command(config-manager)' && \
+        yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
+        scl enable gcc-toolset-14 bash && \
+        source /opt/rh/gcc-toolset-14/enable && \
+		gcc -v && \
+		make -v && \
         yum config-manager --set-enabled powertools; \
-    elif [ "$VERSION_NUM" = "7" ] || [ "$VERSION_NUM" = "6" ]; then \
-        yum install -y perl-IPC-Cmd; \
+    elif [ "$VERSION_NUM" = "7" ]; then \
+        yum install -y perl-IPC-Cmd && \
+		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos7-devtoolset.repo && \
+		echo "name=CentOS-7 - SCLo rh" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
+		echo "baseurl=https://vault.centos.org/7.9.2009/sclo/x86_64/rh/" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
+		echo "gpgcheck=0" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
+		echo "enabled=1" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
+		yum -y update && \
+		yum -y install devtoolset-11 --nogpgcheck && \
+		scl enable devtoolset-11 bash && \
+		source /opt/rh/devtoolset-11/enable && \
+		gcc -v && \
+		make -v; \
+    elif [ "$VERSION_NUM" = "6" ]; then \
+        yum install -y perl-IPC-Cmd && \
+		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos6-devtoolset.repo  && \
+		echo "name=CentOS-6 - SCLo rh" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
+		echo "baseurl=https://vault.centos.org/6.10/sclo/x86_64/rh" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
+		echo "gpgcheck=0" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
+		echo "enabled=1" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
+		yum -y install devtoolset-9  && \
+		scl enable devtoolset-9 bash  && \
+		source /opt/rh/devtoolset-9/enable  && \
+		gcc -v  && \
+		make -v;  \
     elif [ "$VERSION_NUM" = "5" ]; then \
         yum install -y gcc44; \
     fi && \

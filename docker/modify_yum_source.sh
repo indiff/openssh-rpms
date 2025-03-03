@@ -79,7 +79,6 @@ function modify_el5() {
 case $RELEASE_VER in
   .el8)
     modify_el8
-    update_gcc_el8
     ;;
   .el7)
     modify_el7
