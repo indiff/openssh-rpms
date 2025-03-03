@@ -24,11 +24,10 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         yum install -y perl-IPC-Cmd && \
 		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos7-devtoolset.repo && \
 		echo "name=CentOS-7 - SCLo rh" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
-		echo "baseurl=https://vault.centos.org/7.9.2009/sclo/x86_64/rh/" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
+		echo "baseurl=https://vault.centos.org/7.9.2009/sclo/x86_64/rh" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
 		echo "gpgcheck=0" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
 		echo "enabled=1" >> /etc/yum.repos.d/centos7-devtoolset.repo && \
-		yum -y update && \
-		yum -y install devtoolset-11 --nogpgcheck && \
+		yum -y install devtoolset-11 && \
 		scl enable devtoolset-11 bash && \
 		source /opt/rh/devtoolset-11/enable && \
 		gcc -v && \
