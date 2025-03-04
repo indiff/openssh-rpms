@@ -6,7 +6,12 @@ name: Create amd64 release
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    tags: [ "v*" ]
+    #tags: [ "v*" ]
+    branches: [ "main" ]
+    paths:
+      - '**/*.yaml'
+      - '**/*.yml'
+    
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -264,10 +269,11 @@ jobs:
           zip -q -9 ${{ github.workspace }}/zip/amzn2_${build_timestamp}.x86_64.zip ./*amzn2.x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/amzn2023${build_timestamp}.x86_64.zip ./*amzn2023.x86_64.rpm
           GITHUB_REF=${{ github.ref }}
-          TAG_NAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
-          NAME="${TAG_NAME}"
-          git tag -l --format='%(contents)' "${TAG_NAME}" | tee -a ${{ github.workspace }}/RELEASE.md
-          gh release create "$TAG_NAME" --target "main" -F ${{ github.workspace }}/RELEASE.md "$NAME" ${{ github.workspace }}/zip/*
+          TAGNAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
+          NAME="${TAGNAME}"
+          git tag -l --format='%(contents)' "${TAGNAME}" | tee -a ${{ github.workspace }}/RELEASE.md
+          gh release delete --cleanup-tag --yes "$TAGNAME" || true
+          gh release create "$TAGNAME" --target "main" -F ${{ github.workspace }}/RELEASE.md --title "$NAME" ${{ github.workspace }}/zip/*
         env:
           GITHUB_TOKEN: ${{ github.token }}
       # - name: Create Release
