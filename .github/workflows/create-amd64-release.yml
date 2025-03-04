@@ -251,20 +251,20 @@ jobs:
           export build_timestamp="$(date +'%Y%m%d_%H%M')"
           echo -e "> Automated release created by GitHub Actions.\n" > ${{ github.workspace }}/RELEASE.md
           cat <<'EOF' > ${{ github.workspace }}/RELEASE.md
-        ```
-        # Backup current SSH config
+          ```
+          # Backup current SSH config
 [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
 
-        # Install rpm packages. Exclude all debug packages.
-        find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --allowerasing
+          # Install rpm packages. Exclude all debug packages.
+          find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --allowerasing
 
-         # in case host key files got permissions too open.
+          # in case host key files got permissions too open.
          chmod -v 600 /etc/ssh/ssh_host_*_key
 
-         # For CentOS7+:
-         # in some cases previously installed systemd unit file is left on disk after upgrade.
-         # causes systemd mixing unit files and initscripts units provided by this package.
-         if [[ -d /run/systemd/system && -f /usr/lib/systemd/system/sshd.service ]]; then
+          # For CentOS7+:
+          # in some cases previously installed systemd unit file is left on disk after upgrade.
+          # causes systemd mixing unit files and initscripts units provided by this package.
+          if [[ -d /run/systemd/system && -f /usr/lib/systemd/system/sshd.service ]]; then
               mv /usr/lib/systemd/system/sshd.service /usr/lib/systemd/system/sshd.service.$(date +%Y%m%d)
               systemctl daemon-reload
           fi
