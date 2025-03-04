@@ -136,6 +136,17 @@ For more details, see file `docker.README.md`
 This package provide following options in `/etc/ssh/sshd_config` to work like triditional sshd.
 
 ```
+cat << 'EOF' > /etc/ssh/sshd_config
+PubkeyAcceptedAlgorithms +ssh-rsa
+PermitRootLogin yes
+PasswordAuthentication yes
+UseDNS no
+UsePAM yes
+KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
+EOF
+```
+
+```
 PubkeyAcceptedAlgorithms +ssh-rsa
 PermitRootLogin yes
 PasswordAuthentication yes

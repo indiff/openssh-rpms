@@ -191,6 +191,8 @@ jobs:
       # - build_el6
       # - build_el5
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -237,6 +239,19 @@ jobs:
       - name: Get tag message
         run: |
           echo -e "> Automated release created by GitHub Actions.\n" > ${{ github.workspace }}/RELEASE.md
+          cat <<'EOF' > ${{ github.workspace }}/RELEASE.md
+          ```
+          cat << 'EOF' > /etc/ssh/sshd_config
+          PubkeyAcceptedAlgorithms +ssh-rsa
+          PermitRootLogin yes
+          PasswordAuthentication yes
+          UseDNS no
+          UsePAM yes
+          KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
+          shitshit
+          ```
+          EOF
+          sed -i 's/shitshit/EOF/g' RELEASE.md
           GITHUB_REF=${{ github.ref }}
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           git tag -l --format='%(contents)' "${TAG_NAME}" | tee -a ${{ github.workspace }}/RELEASE.md
