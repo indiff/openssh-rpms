@@ -236,8 +236,11 @@ jobs:
       #     name: el5-amd64
       #     path: ./output
 
-      - name: Get tag message
+      - name: Publish release
         run: |
+          set -xe
+          sudo timedatectl set-timezone Asia/Shanghai
+          export build_timestamp="$(date +'%Y%m%d_%H%M')"
           echo -e "> Automated release created by GitHub Actions.\n" > ${{ github.workspace }}/RELEASE.md
           cat <<'EOF' > ${{ github.workspace }}/RELEASE.md
           ```
@@ -251,16 +254,19 @@ jobs:
           shitshit
           ```
           EOF
+          export build_timestamp="$(date +'%Y%m%d_%H%M')"
           sed -i 's/shitshit/EOF/g' RELEASE.md
           GITHUB_REF=${{ github.ref }}
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          TAG_NAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
+          NAME="${TAG_NAME}"
           git tag -l --format='%(contents)' "${TAG_NAME}" | tee -a ${{ github.workspace }}/RELEASE.md
+          gh release create "$TAG_NAME" --target "main" -F ${{ github.workspace }}/RELEASE.md "$NAME" ${{ github.workspace }}/output/*
 
-      - name: Create Release
-        id: create_release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "${{ github.workspace }}/output/*"
-          bodyFile: ${{ github.workspace }}/RELEASE.md
-          token: ${{ secrets.GITHUB_TOKEN }}
-          allowUpdates: true
+      # - name: Create Release
+      #   id: create_release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     artifacts: "${{ github.workspace }}/output/*"
+      #     bodyFile: ${{ github.workspace }}/RELEASE.md
+      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     allowUpdates: true
