@@ -254,14 +254,22 @@ jobs:
           shitshit
           ```
           EOF
-          export build_timestamp="$(date +'%Y%m%d_%H%M')"
           sed -i 's/shitshit/EOF/g' RELEASE.md
+          mkdir -p ${{ github.workspace }}/zip
+          cd ${{ github.workspace }}/output/
+          zip -q -9 ${{ github.workspace }}/zip/el7_${build_timestamp}.x86_64.zip ./*el7_.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/el8_${build_timestamp}.x86_64.zip ./*el8.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/el9${build_timestamp}.x86_64.zip ./*el9.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/amzn1_${build_timestamp}.x86_64.zip ./*amzn1.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/amzn2_${build_timestamp}.x86_64.zip ./*amzn2.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/amzn2023${build_timestamp}.x86_64.zip ./*amzn2023.x86_64.rpm
           GITHUB_REF=${{ github.ref }}
           TAG_NAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
           NAME="${TAG_NAME}"
           git tag -l --format='%(contents)' "${TAG_NAME}" | tee -a ${{ github.workspace }}/RELEASE.md
-          gh release create "$TAG_NAME" --target "main" -F ${{ github.workspace }}/RELEASE.md "$NAME" ${{ github.workspace }}/output/*
-
+          gh release create "$TAG_NAME" --target "main" -F ${{ github.workspace }}/RELEASE.md "$NAME" ${{ github.workspace }}/zip/*
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       # - name: Create Release
       #   id: create_release
       #   uses: ncipollo/release-action@v1
