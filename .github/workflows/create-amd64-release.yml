@@ -127,6 +127,7 @@ jobs:
           path: ${{ github.workspace }}/output
 
   build_el6:
+    if: false
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -146,6 +147,7 @@ jobs:
           path: ${{ github.workspace }}/output
 
   build_el5:
+    if: false
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -186,8 +188,8 @@ jobs:
       - build_el9
       - build_el8
       - build_el7
-      - build_el6
-      - build_el5
+      # - build_el6
+      # - build_el5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -222,15 +224,15 @@ jobs:
           name: el7-amd64
           path: ./output
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: el6-amd64
-          path: ./output
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #     name: el6-amd64
+      #     path: ./output
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: el5-amd64
-          path: ./output
+      # - uses: actions/download-artifact@v4
+      #   with:
+      #     name: el5-amd64
+      #     path: ./output
 
       - name: Get tag message
         run: |
