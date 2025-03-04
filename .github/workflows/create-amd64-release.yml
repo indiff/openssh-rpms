@@ -272,7 +272,7 @@ jobs:
           zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2_${build_timestamp}.x86_64.zip ./*amzn2*x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2023${build_timestamp}.x86_64.zip ./*amzn2023*x86_64.rpm
           GITHUB_REF=${{ github.ref }}
-          TAGNAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
+          TAGNAME="Openssh_${build_timestamp}"
           NAME="${TAGNAME}"
           git tag -l --format='%(contents)' "${TAGNAME}" | tee -a ${{ github.workspace }}/RELEASE.md
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
