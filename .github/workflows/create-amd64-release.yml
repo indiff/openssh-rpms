@@ -276,9 +276,9 @@ jobs:
           service sshd restart
           ```
           ```
-          ```
           yum erase openssh-askpass openssh-keycat openssh-cavs openssh-askpass openssh-askpass-gnome openssh-debuginfo
           rpm -ivh --force --nodeps --replacepkgs --replacefiles openssh-*.rpm
+          ```
           ```
           cat << 'EOF' > /etc/ssh/sshd_config
           PubkeyAcceptedAlgorithms +ssh-rsa
