@@ -265,12 +265,12 @@ jobs:
           sed -i 's/shitshit/EOF/g' RELEASE.md
           mkdir -p ${{ github.workspace }}/zip
           cd ${{ github.workspace }}/output/
-          zip -q -9 ${{ github.workspace }}/zip/el7_${build_timestamp}.x86_64.zip ./*el7_.x86_64.rpm
-          zip -q -9 ${{ github.workspace }}/zip/el8_${build_timestamp}.x86_64.zip ./*el8.x86_64.rpm
-          zip -q -9 ${{ github.workspace }}/zip/el9${build_timestamp}.x86_64.zip ./*el9.x86_64.rpm
-          zip -q -9 ${{ github.workspace }}/zip/amzn1_${build_timestamp}.x86_64.zip ./*amzn1.x86_64.rpm
-          zip -q -9 ${{ github.workspace }}/zip/amzn2_${build_timestamp}.x86_64.zip ./*amzn2.x86_64.rpm
-          zip -q -9 ${{ github.workspace }}/zip/amzn2023${build_timestamp}.x86_64.zip ./*amzn2023.x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_el7_${build_timestamp}.x86_64.zip ./*el7*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_el8_${build_timestamp}.x86_64.zip ./*el8*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_el9${build_timestamp}.x86_64.zip ./*el9*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_amzn1_${build_timestamp}.x86_64.zip ./*amzn1*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2_${build_timestamp}.x86_64.zip ./*amzn2*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2023${build_timestamp}.x86_64.zip ./*amzn2023*x86_64.rpm
           GITHUB_REF=${{ github.ref }}
           TAGNAME="${GITHUB_REF#refs/tags/}_${build_timestamp}"
           NAME="${TAGNAME}"
