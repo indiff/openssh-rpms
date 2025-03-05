@@ -215,6 +215,16 @@ environment.
 %setup -q
 %endif
 
+# add gcc version and build time
+# 判断 version.h 文件是否存在
+if [ -f version.h ]; then
+    sed -i 's/#define SSH_VERSION[[:space:]]*"OpenSSH_\([^"]*\)"/#define SSH_VERSION\t"OpenSSH_\1, GCC " GCC_VERSION ", Built on " BUILD_TIME"/' version.h
+    sed -i '1i\#define GCC_VERSION __VERSION__' version.h
+    sed -i '1i\#define BUILD_TIME __DATE__ " " __TIME__' version.h
+else
+    echo "version.h not found"
+fi
+
 # Add content below to use source code of OpenSSL
 %if ! %{no_build_openssl}
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl

@@ -11,6 +11,8 @@ COPY . /data
 
 RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     bash ./docker/modify_yum_source.sh && \
+    yum groupinstall -y "Development Tools" && \
+    yum install -y imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
     if [ "$VERSION_NUM" = "8" ]; then \
         yum install -y perl perl-IPC-Cmd && \
         yum install -y 'dnf-command(config-manager)' && \
@@ -52,8 +54,13 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     elif [ "$VERSION_NUM" = "5" ]; then \
         yum install -y gcc44; \
     fi && \
-    yum groupinstall -y "Development Tools" && \
-    yum install -y imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
+    echo 'LANG=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LANGUAGE=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_ALL=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_CTYPE=zh_CN.UTF-8' >> /etc/environment && \
+    yum -y install tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo 'Asia/Shanghai' > /etc/timezone && \
     yum clean all && \
     find . -type f -name '.keep' -delete && \
     sed -i "s/--define 'skip_x11_askpass 1'/--define \"debug_package %{nil}\"/" ./compile.sh && \
