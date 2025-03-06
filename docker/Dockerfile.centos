@@ -18,6 +18,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         yum install -y 'dnf-command(config-manager)' && \
         yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
         scl enable gcc-toolset-14 bash && \
+        echo 'source /opt/rh/gcc-toolset-14/enable' >> /etc/profile.d/gcc-toolset-14.sh && \
         source /opt/rh/gcc-toolset-14/enable && \
 		gcc -v && \
 		make -v && \
@@ -36,6 +37,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         echo "enabled=1" >> /etc/yum.repos.d/c7-devtoolset-12.aarch64.repo && \
 		yum -y install devtoolset-12 && \
 		scl enable devtoolset-12 bash && \
+        echo 'source /opt/rh/devtoolset-12/enable' >> /etc/profile.d/devtoolset-12.sh && \
 		source /opt/rh/devtoolset-12/enable && \
 		gcc -v && \
 		make -v; \
@@ -48,6 +50,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
 		echo "enabled=1" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
 		yum -y install devtoolset-9  && \
 		scl enable devtoolset-9 bash  && \
+        echo 'source /opt/rh/devtoolset-9/enable' >> /etc/profile.d/devtoolset-9.sh  && \
 		source /opt/rh/devtoolset-9/enable  && \
 		gcc -v  && \
 		make -v;  \

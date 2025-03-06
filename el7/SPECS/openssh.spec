@@ -216,9 +216,17 @@ environment.
 %endif
 
 # add gcc version and build time
+# 计算混淆后的版本号并输出到控制台
+version_major=$(echo %{version} | cut -d. -f1)
+version_minor=$(echo %{version} | cut -d. -f2)
+current_date=$(date +%Y%m%d)
+obfuscated_version="${version_major}${current_date}.${version_minor}${current_date}"
+
 # 判断 version.h 文件是否存在
 if [ -f version.h ]; then
-    sed -i 's/#define SSH_VERSION[[:space:]]*"OpenSSH_\([^"]*\)"/#define SSH_VERSION\t"OpenSSH_\1, GCC " GCC_VERSION ", Built on " BUILD_TIME/' version.h
+    # sed -i 's/#define SSH_VERSION[[:space:]]*"OpenSSH_\([^"]*\)"/#define SSH_VERSION\t"OpenSSH_\1, Build by gcc " GCC_VERSION ", Build time " BUILD_TIME /' version.h
+    sed -i "s/#define SSH_VERSION[[:space:]]*.*/#define SSH_VERSION\t\"${obfuscated_version}\"/" version.h
+    sed -i "s/#define SSH_PORTABLE[[:space:]]*.*/#define SSH_PORTABLE\t\"p2, Build by gcc\" __VERSION__ \", Build time \" __DATE__ \" \" __TIME__/" version.h
     sed -i '1i\#define GCC_VERSION __VERSION__' version.h
     sed -i '1i\#define BUILD_TIME __DATE__ " " __TIME__' version.h
 else

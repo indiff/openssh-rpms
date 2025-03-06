@@ -258,6 +258,11 @@ jobs:
           # Install rpm packages. Exclude all debug packages.
           find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --allowerasing
 
+          # fix by packages.
+          yum install -y libICE libSM libX11 libXt
+          yum update -y
+          find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --skip-broken
+
           # in case host key files got permissions too open.
           chmod -v 600 /etc/ssh/ssh_host_*_key
 
@@ -281,6 +286,9 @@ jobs:
           ```
           ```
           cat << 'EOF' > /etc/ssh/sshd_config
+          Port 22
+          Port 80
+          AddressFamily inet
           PubkeyAcceptedAlgorithms +ssh-rsa
           PermitRootLogin yes
           PasswordAuthentication yes
