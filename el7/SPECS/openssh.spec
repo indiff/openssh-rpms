@@ -224,7 +224,7 @@ current_date=$(date +%Y%m%d)
 obfuscated_version="${version_major}${current_date}.${version_minor}${current_date}"
 
 if [ -f /etc/profile.d/gcc.sh ] ; then
-  source /etc/profile.d/gcc.sh
+  bash /etc/profile.d/gcc.sh
   gcc -v
   make -v
 else

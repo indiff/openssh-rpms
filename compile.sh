@@ -113,6 +113,17 @@ LIST_RPMS() {
     [[ -d $RPMDIR ]] && find $RPMDIR -type f -name '*.rpm' ! -name '*debug*'
 }
 
+
+UPDATE_GCC() {
+    if [ -f /etc/profile.d/gcc.sh ] ; then
+		bash /etc/profile.d/gcc.sh
+		gcc -v
+		make -v
+	else
+		echo "not found gcc.sh"
+	fi
+}
+
 # sub cmds
 case $arg1 in
 	GETEL)
@@ -126,6 +137,7 @@ case $arg1 in
 		;;
 esac
 
+UPDATE_GCC
 
 # manual specified dist
 [[ -n $arg1 && -d $__dir/$arg1 ]] && rpmtopdir=$arg1 && BUILD_RPM && exit 0
