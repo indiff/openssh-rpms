@@ -64,6 +64,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     yum -y install tzdata && \
     ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     echo 'Asia/Shanghai' > /etc/timezone && \
+    yum search devtoolset && \
     yum clean all && \
     find . -type f -name '.keep' -delete && \
     sed -i "s/--define 'skip_x11_askpass 1'/--define \"debug_package %{nil}\"/" ./compile.sh && \

@@ -31,7 +31,20 @@ RUN if [ "$VERSION_NUM" = "8" ]; then \
     yum clean all && yum makecache && \
     yum groupinstall -y "Development Tools" && \
     yum install -y imake perl rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
+    yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
+    scl enable gcc-toolset-14 bash && \
+    echo 'source /opt/rh/gcc-toolset-14/enable' >> /etc/profile.d/gcc.sh && \
+    source /opt/rh/gcc-toolset-14/enable && \
+    gcc -v && \
+    make -v && \
     yum clean all && \
+    echo 'LANG=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LANGUAGE=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_ALL=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_CTYPE=zh_CN.UTF-8' >> /etc/environment && \
+    yum -y install tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo 'Asia/Shanghai' > /etc/timezone && \
     find . -type f -name '.keep' -delete && \
     sed -i "s/--define 'skip_x11_askpass 1'/--define \"debug_package %{nil}\"/" ./compile.sh && \
     bash ./pullsrc.sh

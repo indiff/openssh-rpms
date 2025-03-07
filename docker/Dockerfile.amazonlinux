@@ -21,6 +21,16 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     yum groupinstall -y "Development Tools" && \
     yum install -y rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel perl perl-IPC-Cmd && \
     yum clean all && \
+    yum search devtoolset && \
+    gcc -v && \
+    make -v && \
+    echo 'LANG=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LANGUAGE=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_ALL=zh_CN.UTF-8' >> /etc/environment && \
+    echo 'LC_CTYPE=zh_CN.UTF-8' >> /etc/environment && \
+    yum -y install tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+    echo 'Asia/Shanghai' > /etc/timezone && \
     find . -type f -name '.keep' -delete && \
     bash ./pullsrc.sh
 
