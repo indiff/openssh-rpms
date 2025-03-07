@@ -19,8 +19,9 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
         scl enable gcc-toolset-14 bash && \
         echo 'source /opt/rh/gcc-toolset-14/enable' >> /etc/profile.d/gcc.sh && \
-        echo 'source /opt/rh/gcc-toolset-14/enable' >> ~/.bashrc && \
+        echo 'export PATH=/opt/rh/devtoolset-14/root/bin:$PATH' >> /etc/profile.d/gcc.sh && \
         source /opt/rh/gcc-toolset-14/enable && \
+        export PATH=/opt/rh/devtoolset-14/root/bin:$PATH && \
 		gcc -v && \
 		make -v && \
         yum config-manager --set-enabled powertools; \
@@ -39,8 +40,9 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
 		yum -y install devtoolset-12 && \
 		scl enable devtoolset-12 bash && \
         echo 'source /opt/rh/devtoolset-12/enable' >> /etc/profile.d/gcc.sh && \
-        echo 'source /opt/rh/gcc-toolset-12/enable' >> ~/.bashrc && \
-		source /opt/rh/devtoolset-12/enable && \
+        echo 'export PATH=/opt/rh/devtoolset-12/root/bin:$PATH' >> /etc/profile.d/gcc.sh && \
+        source /opt/rh/gcc-toolset-12/enable && \
+        export PATH=/opt/rh/devtoolset-12/root/bin:$PATH && \
 		gcc -v && \
 		make -v; \
     elif [ "$VERSION_NUM" = "6" ]; then \
@@ -53,8 +55,9 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
 		yum -y install devtoolset-9  && \
 		scl enable devtoolset-9 bash  && \
         echo 'source /opt/rh/devtoolset-9/enable' >> /etc/profile.d/gcc.sh  && \
-        echo 'source /opt/rh/gcc-toolset-9/enable' >> ~/.bashrc && \
-		source /opt/rh/devtoolset-9/enable  && \
+        echo 'export PATH=/opt/rh/devtoolset-9/root/bin:$PATH' >> /etc/profile.d/gcc.sh && \
+        source /opt/rh/gcc-toolset-9/enable && \
+        export PATH=/opt/rh/devtoolset-9/root/bin:$PATH && \
 		gcc -v  && \
 		make -v;  \
     elif [ "$VERSION_NUM" = "5" ]; then \

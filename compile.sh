@@ -137,7 +137,7 @@ case $arg1 in
 		;;
 esac
 
-UPDATE_GCC
+# UPDATE_GCC
 
 # manual specified dist
 [[ -n $arg1 && -d $__dir/$arg1 ]] && rpmtopdir=$arg1 && BUILD_RPM && exit 0
