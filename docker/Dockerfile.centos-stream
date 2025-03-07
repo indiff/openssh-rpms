@@ -31,6 +31,9 @@ RUN if [ "$VERSION_NUM" = "8" ]; then \
     yum clean all && yum makecache && \
     yum groupinstall -y "Development Tools" && \
     yum install -y imake perl rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
+    dnf install -y epel-release && \
+    dnf install -y centos-release-scl && \
+    dnf search gcc-toolset && \
     yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
     scl enable gcc-toolset-14 bash && \
     echo 'source /opt/rh/gcc-toolset-14/enable' >> /etc/profile.d/gcc.sh && \
