@@ -11,14 +11,14 @@ on:
       - '**/*.yaml'
       - '**/*.yml'
       - '**/*.sh'
-      - '**/*Dockerfile*'
+      - '**/Dockerfile.*'
   pull_request:
     branches: [ "main" ]
     paths:
       - '**/*.yaml'
       - '**/*.yml'
       - '**/*.sh'
-      - '**/*Dockerfile*'
+      - '**/Dockerfile.*'
 
 
   # Allows you to run this workflow manually from the Actions tab
