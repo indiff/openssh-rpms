@@ -217,9 +217,9 @@ environment.
 
 # add gcc version and build time
 # 计算混淆后的版本号并输出到控制台
-version_num=$(echo %{version} | cut -dp -f1)
-version_major=$(echo %{version_num} | cut -d. -f1)
-version_minor=$(echo %{version_num} | cut -d. -f2)
+version_num=$(echo ${version} | cut -dp -f1)
+version_major=$(echo ${version_num} | cut -d. -f1)
+version_minor=$(echo ${version_num} | cut -d. -f2)
 current_date=$(date +%Y%m%d)
 obfuscated_version="${version_major}${current_date}.${version_minor}${current_date}"
 
