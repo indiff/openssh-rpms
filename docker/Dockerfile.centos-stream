@@ -45,8 +45,6 @@ RUN if [ "$VERSION_NUM" = "8" ]; then \
         ln -s /opt/rh/devtoolset-13/root/usr/bin/cpp /usr/bin/cpp && \
         ln -s /opt/rh/devtoolset-13/root/usr/bin/gfortran /usr/bin/gfortran && \
         ln -s /opt/rh/devtoolset-13/root/usr/bin/make /usr/bin/make && \
-    gcc -v && \
-    make -v && \
     yum clean all && \
     echo 'LANG=zh_CN.UTF-8' >> /etc/environment && \
     echo 'LANGUAGE=zh_CN.UTF-8' >> /etc/environment && \
