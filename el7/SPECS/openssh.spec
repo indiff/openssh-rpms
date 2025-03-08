@@ -217,19 +217,23 @@ environment.
 
 # add gcc version and build time
 # 计算混淆后的版本号并输出到控制台
-before_dot=$(echo "$version" | awk -F'.' '{print $1}'| sed 's/[^0-9]//g')
-after_dot=$(echo "$version" | awk -F'.' '{print $2}' | sed 's/[^0-9]//g')
+before_dot=$(echo "%{version}" | awk -F'.' '{print $1}'| sed 's/[^0-9]//g')
+after_dot=$(echo "%{version}" | awk -F'.' '{print $2}' | sed 's/[^0-9]//g')
 current_date=$(date +%Y%m%d)
 obfuscated_version="${before_dot}${current_date}.${after_dot}${current_date}"
 
 # check gcc version
 if [-f /opt/rh/devtoolset-12/root/bin]; then
+  echo "not found /opt/rh/devtoolset-12/root/bin"
   source /opt/rh/devtoolset-12/enable
   export PATH=/opt/rh/devtoolset-12/root/bin:$PATH
   gcc -v
   make -v
 else
   echo "not found /opt/rh/devtoolset-12/root/bin"
+  yum -y install devtoolset-12 && \
+  scl enable devtoolset-12 bash && \
+  source /opt/rh/devtoolset-12/enable && \
   gcc -v
   make -v
 fi
