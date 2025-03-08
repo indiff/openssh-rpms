@@ -34,6 +34,17 @@ RUN if [ "$VERSION_NUM" = "8" ]; then \
     yum install -y epel-release && \
     yum install -y gcc-toolset-13-gcc gcc-toolset-13-gcc-c++ && \
     export PATH=/opt/rh/devtoolset-13/root/bin:$PATH && \
+        rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
+        rm -f /usr/bin/gcc && \
+        rm -f /usr/bin/g++ && \
+        rm -f /usr/bin/cpp && \
+        rm -f /usr/bin/gfortran && \
+        rm -f /usr/bin/make && \
+        ln -s /opt/rh/devtoolset-13/root/usr/bin/gcc /usr/bin/gcc && \
+        ln -s /opt/rh/devtoolset-13/root/usr/bin/g++ /usr/bin/g++ && \
+        ln -s /opt/rh/devtoolset-13/root/usr/bin/cpp /usr/bin/cpp && \
+        ln -s /opt/rh/devtoolset-13/root/usr/bin/gfortran /usr/bin/gfortran && \
+        ln -s /opt/rh/devtoolset-13/root/usr/bin/make /usr/bin/make && \
     gcc -v && \
     make -v && \
     yum clean all && \
