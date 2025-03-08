@@ -39,6 +39,17 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         echo "source /opt/rh/devtoolset-12/enable" >> ~/.bash_profile && \
         echo "export PATH=/opt/rh/devtoolset-9/root/bin:$PATH" >> ~/.bash_profile && \
         export PATH=/opt/rh/devtoolset-12/root/bin:$PATH && \
+        rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
+        rm -f /usr/bin/gcc && \
+        rm -f /usr/bin/g++ && \
+        rm -f /usr/bin/cpp && \
+        rm -f /usr/bin/gfortran && \
+        rm -f /usr/bin/make && \
+        ln -s /opt/rh/devtoolset-12/root/usr/bin/gcc /usr/bin/gcc && \
+        ln -s /opt/rh/devtoolset-12/root/usr/bin/g++ /usr/bin/g++ && \
+        ln -s /opt/rh/devtoolset-12/root/usr/bin/cpp /usr/bin/cpp && \
+        ln -s /opt/rh/devtoolset-12/root/usr/bin/gfortran /usr/bin/gfortran && \
+        ln -s /opt/rh/devtoolset-12/root/usr/bin/make /usr/bin/make && \
 		gcc -v && \
 		make -v; \
     elif [ "$VERSION_NUM" = "6" ]; then \

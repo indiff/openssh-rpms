@@ -223,20 +223,8 @@ current_date=$(date +%Y%m%d)
 obfuscated_version="${before_dot}${current_date}.${after_dot}${current_date}"
 
 # check gcc version
-if [-f /opt/rh/devtoolset-12/root/bin]; then
-  echo "not found /opt/rh/devtoolset-12/root/bin"
-  source /opt/rh/devtoolset-12/enable
-  export PATH=/opt/rh/devtoolset-12/root/bin:$PATH
-  gcc -v
-  make -v
-else
-  echo "not found /opt/rh/devtoolset-12/root/bin"
-  yum -y install devtoolset-12 && \
-  scl enable devtoolset-12 bash && \
-  source /opt/rh/devtoolset-12/enable && \
-  gcc -v
-  make -v
-fi
+gcc -v
+make -v
 
 # 判断 version.h 文件是否存在
 if [ -f version.h ]; then
