@@ -34,6 +34,10 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         echo "gpgcheck=0" >> /etc/yum.repos.d/c7-devtoolset-12.aarch64.repo && \
         echo "enabled=1" >> /etc/yum.repos.d/c7-devtoolset-12.aarch64.repo && \
 		yum -y install devtoolset-12 && \
+        scl enable devtoolset-12 bash && \
+        source /opt/rh/devtoolset-12/enable && \
+        echo "source /opt/rh/devtoolset-12/enable" >> ~/.bash_profile && \
+        echo "export PATH=/opt/rh/devtoolset-9/root/bin:$PATH" >> ~/.bash_profile && \
         export PATH=/opt/rh/devtoolset-12/root/bin:$PATH && \
 		gcc -v && \
 		make -v; \

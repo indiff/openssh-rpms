@@ -217,19 +217,14 @@ environment.
 
 # add gcc version and build time
 # 计算混淆后的版本号并输出到控制台
-version_num=$(echo ${version} | cut -dp -f1)
-version_major=$(echo ${version_num} | cut -d. -f1)
-version_minor=$(echo ${version_num} | cut -d. -f2)
+before_dot=$(echo "$version" | awk -F'.' '{print $1}'| sed 's/[^0-9]//g')
+after_dot=$(echo "$version" | awk -F'.' '{print $2}' | sed 's/[^0-9]//g')
 current_date=$(date +%Y%m%d)
-obfuscated_version="${version_major}${current_date}.${version_minor}${current_date}"
+obfuscated_version="${before_dot}${current_date}.${after_dot}${current_date}"
 
-if [ -f /etc/profile.d/gcc.sh ] ; then
-  bash /etc/profile.d/gcc.sh
-  gcc -v
-  make -v
-else
-  echo "not found gcc.sh"
-fi
+# check gcc version
+gcc -v
+make -v
 
 # 判断 version.h 文件是否存在
 if [ -f version.h ]; then
