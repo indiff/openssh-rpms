@@ -302,6 +302,7 @@ jobs:
           mkdir -p ${{ github.workspace }}/zip
           cd ${{ github.workspace }}/output/
           zip -q -9 ${{ github.workspace }}/zip/openssh_el7_${build_timestamp}.x86_64.zip ./*el7*x86_64.rpm
+          zip -q -9 ${{ github.workspace }}/zip/openssh_el6_${build_timestamp}.x86_64.zip ./*el6*x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/openssh_el8_${build_timestamp}.x86_64.zip ./*el8*x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/openssh_el9_${build_timestamp}.x86_64.zip ./*el9*x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/openssh_amzn1_${build_timestamp}.x86_64.zip ./*amzn1*x86_64.rpm
