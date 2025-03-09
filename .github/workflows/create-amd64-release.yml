@@ -132,7 +132,7 @@ jobs:
           path: ${{ github.workspace }}/output
 
   build_el6:
-    if: false
+    if: true
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -193,7 +193,7 @@ jobs:
       - build_el9
       - build_el8
       - build_el7
-      # - build_el6
+      - build_el6
       # - build_el5
     runs-on: ubuntu-latest
     permissions:
