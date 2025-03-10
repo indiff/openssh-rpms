@@ -218,6 +218,28 @@ environment.
 %setup -q
 %endif
 
+# add gcc version and build time
+# 计算混淆后的版本号并输出到控制台
+before_dot=$(echo "%{version}" | awk -F'.' '{print $1}'| sed 's/[^0-9]//g')
+after_dot=$(echo "%{version}" | awk -F'.' '{print $2}' | sed 's/[^0-9]//g')
+current_date=$(date +%Y%m%d)
+obfuscated_version="${before_dot}${current_date}.${after_dot}${current_date}"
+
+# check gcc version
+gcc -v
+make -v
+
+# 判断 version.h 文件是否存在
+if [ -f version.h ]; then
+    # sed -i 's/#define SSH_VERSION[[:space:]]*"OpenSSH_\([^"]*\)"/#define SSH_VERSION\t"OpenSSH_\1, Build by gcc " GCC_VERSION ", Build time " BUILD_TIME /' version.h
+    sed -i "s/#define SSH_VERSION[[:space:]]*.*/#define SSH_VERSION\t\"OpenSSH_${obfuscated_version}\"/" version.h
+    sed -i "s/#define SSH_PORTABLE[[:space:]]*.*/#define SSH_PORTABLE\t\"p2, Build by gcc\" __VERSION__ \", Build time \" __DATE__ \" \" __TIME__/" version.h
+    sed -i '1i\#define GCC_VERSION __VERSION__' version.h
+    sed -i '1i\#define BUILD_TIME __DATE__ " " __TIME__' version.h
+else
+    echo "version.h not found"
+fi
+
 # Add content below to use source code of OpenSSL
 %if ! %{no_build_openssl}
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl
