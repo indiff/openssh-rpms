@@ -12,7 +12,7 @@ COPY . /data
 RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     bash ./docker/modify_yum_source.sh && \
     yum groupinstall -y "Development Tools" && \
-    yum install -y imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
+    yum install -y curl zip unzip imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
     if [ "$VERSION_NUM" = "8" ]; then \
         yum install -y perl perl-IPC-Cmd && \
         yum install -y 'dnf-command(config-manager)' && \
@@ -62,7 +62,15 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         ln -s /opt/rh/devtoolset-12/root/usr/bin/gfortran /usr/bin/gfortran && \
         ln -s /opt/rh/devtoolset-12/root/usr/bin/make /usr/bin/make && \
 		gcc -v && \
-		make -v; \
+		make -v && \
+        yum -y remove git \
+        yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
+        yum -y install git && \
+        git --version && \
+        curl -sLo /opt/indiff-gcc.zip https://github.com/indiff/gcc-build/releases/download/20250414_0940/gcc-indiff-centos7-x86_64-20250414_0938.xz && \
+        unzip /opt/indiff-gcc.zip -d /opt/indiff-gcc && \
+        export CC=/opt/indiff-gcc/bin/gcc && \
+        /opt/indiff-gcc/bin/gcc -v; \
     elif [ "$VERSION_NUM" = "6" ]; then \
         yum install -y perl-IPC-Cmd && \
 		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos6-devtoolset.repo  && \
