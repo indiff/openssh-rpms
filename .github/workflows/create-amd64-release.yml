@@ -247,9 +247,10 @@ jobs:
           sudo apt-get install \
             zip \
             unzip
+          source version.env
           sudo timedatectl set-timezone Asia/Shanghai
           export build_timestamp="$(date +'%Y%m%d_%H%M')"
-          echo -e "> Automated release created by GitHub Actions.\n" > ${{ github.workspace }}/RELEASE.md
+          echo -e "> Automated release OpenSSH_${OPENSSHVER} with OpenSSL_${OPENSSLVER}.\n" > ${{ github.workspace }}/RELEASE.md
           cat <<'EOF' > ${{ github.workspace }}/RELEASE.md
           ```
           # Backup current SSH config
@@ -309,7 +310,7 @@ jobs:
           zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2_${build_timestamp}.x86_64.zip ./*amzn2*x86_64.rpm
           zip -q -9 ${{ github.workspace }}/zip/openssh_amzn2023_${build_timestamp}.x86_64.zip ./*amzn2023*x86_64.rpm
           GITHUB_REF=${{ github.ref }}
-          TAGNAME="OpenSSH_${build_timestamp}"
+          TAGNAME="OpenSSH_${OPENSSHVER}_${build_timestamp}"
           NAME="${TAGNAME}"
           git tag -l --format='%(contents)' "${TAGNAME}" | tee -a ${{ github.workspace }}/RELEASE.md
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
