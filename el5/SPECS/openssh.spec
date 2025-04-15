@@ -238,7 +238,7 @@ environment.
 # Applay a patch if glibc version is 2.5, not sure about other versions
 %global glibc_version %(ldd --version 2>&1 | head -n1 | grep -oP '[0-9.]+')
 echo "GLIBC version: %{glibc_version}"
-%if "%{glibc_version}" <= "2.5"
+%if "%{glibc_version}" <= "2.5" && "%{opensshver}" == "9.9p2"
 %patch0 -p0
 %endif
 
@@ -496,6 +496,7 @@ fi
 %dir %attr(0111,root,root) %{_var}/empty/sshd
 %attr(0755,root,root) %{_sbindir}/sshd
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-session
+%attr(0755,root,root) %{_libexecdir}/openssh/sshd-auth
 %attr(0755,root,root) %{_libexecdir}/openssh/sftp-server
 %attr(0644,root,root) %{_mandir}/man8/sshd.8*
 %attr(0644,root,root) %{_mandir}/man5/moduli.5*
