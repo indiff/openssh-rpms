@@ -83,7 +83,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
             echo "Skipping x86_64-specific commands on $(uname -m) architecture"; \
         fi  && \
         gcc -v && \
-		make -v && \
+		make -v; \
     elif [ "$VERSION_NUM" = "6" ]; then \
         yum install -y perl-IPC-Cmd && \
 		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos6-devtoolset.repo  && \
