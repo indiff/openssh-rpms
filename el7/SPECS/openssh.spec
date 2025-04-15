@@ -237,6 +237,12 @@ else
     echo "version.h not found"
 fi
 
+# 判断 indiff-gcc 文件是否存在
+if [ -f /opt/indiff-gcc/bin/gcc ]; then
+    CC=/opt/indiff-gcc/bin/gcc
+    echo "version.h not found"
+fi
+
 # Add content below to use source code of OpenSSL
 %if ! %{no_build_openssl}
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl
