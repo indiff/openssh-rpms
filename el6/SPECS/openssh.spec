@@ -6,6 +6,9 @@
 # wheather to build openssl
 %global no_build_openssl 0
 
+# 是否编译代码仓库
+%global build_nightly 0
+
 #if defined openssl_dir, don't build it
 %{?openssl_dir:%global no_build_openssl 1}
 
