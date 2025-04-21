@@ -251,7 +251,7 @@ jobs:
           sudo timedatectl set-timezone Asia/Shanghai
           export build_timestamp="$(date +'%Y%m%d_%H%M')"
           echo -e "> Automated release OpenSSH_${OPENSSHVER} with OpenSSL_${OPENSSLVER}.\n" > ${{ github.workspace }}/RELEASE.md
-          cat <<'EOF' > ${{ github.workspace }}/RELEASE.md
+          cat <<'EOF' >> ${{ github.workspace }}/RELEASE.md
           ```
           # Backup current SSH config
           [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
@@ -289,12 +289,17 @@ jobs:
           cat << 'EOF' > /etc/ssh/sshd_config
           Port 22
           Port 80
+          Port 22
           AddressFamily inet
           PubkeyAcceptedAlgorithms +ssh-rsa
           PermitRootLogin yes
           PasswordAuthentication yes
           UseDNS no
           UsePAM yes
+          TCPKeepAlive yes
+          ClientAliveInterval 60
+          ClientAliveCountMax 3
+          Subsystem sftp internal-sftp
           KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
           shitshit
           ```

@@ -66,7 +66,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
             yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
             yum -y install git && \
             git --version && \
-            curl -sLo /opt/indiff-gcc.zip https://github.com/indiff/gcc-build/releases/download/20250414_0940/gcc-indiff-centos7-x86_64-20250414_0938.xz && \
+            curl -sLo /opt/indiff-gcc.zip https://github.com/indiff/gcc-build/releases/download/20250420_1003_16.0.0/gcc-indiff-centos7-16.0.0-x86_64-20250420_0929.xz && \
             unzip /opt/indiff-gcc.zip -d /opt/indiff-gcc && \
             rm -f opt/indiff-gcc.zip && \
             rm -f /usr/bin/gcc && \
