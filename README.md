@@ -1,5 +1,7 @@
 # Backport OpenSSH RPM / SRPM for CentOS
 
+[![GitHub all releases](https://img.shields.io/github/downloads/indiff/openssh-rpms/total)](https://github.com/indiff/openssh-rpms/releases)
+
 A simple script to backport latest OpenSSH RPMs for CentOS/RHEL (like) distros.
 
 Similar Project: [Backport OpenSSH for Debian / Ubuntu distros](https://github.com/boypt/openssh-deb)
