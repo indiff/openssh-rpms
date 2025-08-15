@@ -26,7 +26,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile Amazon Linux 2023 (amd64)"
         run: |
@@ -45,7 +45,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile Amazon Linux 2 (amd64)"
         run: |
@@ -64,7 +64,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile Amazon Linux 1 (amd64)"
         run: |
@@ -83,7 +83,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile CentOS Stream 9 (amd64)"
         run: |
@@ -102,7 +102,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: "Compile CentOS Stream 8 (amd64)"
         run: |
           docker run --rm -v ${{ github.workspace }}/output:/data/el7/RPMS/x86_64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:centos-stream8
@@ -120,7 +120,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile CentOS 7 (amd64)"
         run: |
@@ -140,7 +140,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Compile CentOS 6 (amd64)"
         run: |
@@ -160,7 +160,7 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "Download packages for CentOS 5"
         run: |
@@ -199,7 +199,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
         with:
@@ -252,6 +252,16 @@ jobs:
           export build_timestamp="$(date +'%Y%m%d_%H%M')"
           echo -e "> Automated release OpenSSH_${OPENSSHVER} with OpenSSL_${OPENSSLVER}.\n" > ${{ github.workspace }}/RELEASE.md
           cat <<'EOF' >> ${{ github.workspace }}/RELEASE.md
+          # Proxy download:
+          ```bash
+          curl -#Lo gcc-indiff.zip "https://ghproxy.cfd/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          ```
+            
+          # Direct download:
+          ```bash         
+          curl -#Lo gcc-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          ```
+
           ```
           # Backup current SSH config
           [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
@@ -287,7 +297,6 @@ jobs:
           ```
           ```
           cat << 'EOF' > /etc/ssh/sshd_config
-          Port 22
           Port 80
           Port 22
           AddressFamily inet
@@ -299,11 +308,14 @@ jobs:
           TCPKeepAlive yes
           ClientAliveInterval 60
           ClientAliveCountMax 3
-          Subsystem sftp internal-sftp
+          #Subsystem sftp  internal-sftp
+          Subsystem sftp  /usr/libexec/openssh/sftp-server
           KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
           shitshit
           ```
           EOF
+          sed -i "s/shitver/${OPENSSHVER}/g" RELEASE.md
+          sed -i "s/shitstamp/${build_timestamp}/g" RELEASE.md
           sed -i 's/shitshit/EOF/g' RELEASE.md
           mkdir -p ${{ github.workspace }}/zip
           cd ${{ github.workspace }}/output/
