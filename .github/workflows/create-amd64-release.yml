@@ -254,15 +254,18 @@ jobs:
           cat <<'EOF' >> ${{ github.workspace }}/RELEASE.md
           # Proxy download:
           ```bash
-          curl -#Lo gcc-indiff.zip "https://ghproxy.cfd/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          curl -#Lo openssh-indiff.zip "https://ghproxy.cfd/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
           ```
             
           # Direct download:
           ```bash         
-          curl -#Lo gcc-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          curl -#Lo openssh-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
           ```
 
           ```
+          unzip openssh-indiff.zip -d openssh
+          cd openssh
+
           # Backup current SSH config
           [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
 
