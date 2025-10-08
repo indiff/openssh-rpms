@@ -14,7 +14,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
     yum groupinstall -y "Development Tools" && \
     yum install -y curl zip unzip imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
     if [ "$VERSION_NUM" = "8" ]; then \
-        yum install -y perl perl-IPC-Cmd && \
+        yum install -y perl perl-IPC-Cmd perl-Time-Piece && \
         yum install -y 'dnf-command(config-manager)' && \
         yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
         export PATH=/opt/rh/devtoolset-14/root/bin:$PATH && \
@@ -33,7 +33,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
 		make -v && \
         yum config-manager --set-enabled powertools; \
     elif [ "$VERSION_NUM" = "7" ]; then \
-        yum install -y perl-IPC-Cmd && \
+        yum install -y perl-IPC-Cmd  perl-Time-Piece  && \
         echo "[c7-devtoolset-12.x86_64]" > /etc/yum.repos.d/c7-devtoolset-12.x86_64.repo && \
         echo "name=c7-devtoolset-12.x86_64" >> /etc/yum.repos.d/c7-devtoolset-12.x86_64.repo && \ 
         echo "baseurl=https://buildlogs.cdn.centos.org/c7-devtoolset-12.x86_64/" >> /etc/yum.repos.d/c7-devtoolset-12.x86_64.repo && \  
@@ -85,7 +85,7 @@ RUN export CHINA_MIRROR="$CHINA_MIRROR" && \
         gcc -v && \
 		make -v; \
     elif [ "$VERSION_NUM" = "6" ]; then \
-        yum install -y perl-IPC-Cmd && \
+        yum install -y perl-IPC-Cmd perl-Time-Piece && \
 		echo "[centos-sclo-rh]" > /etc/yum.repos.d/centos6-devtoolset.repo  && \
 		echo "name=CentOS-6 - SCLo rh" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
 		echo "baseurl=https://vault.centos.org/6.10/sclo/x86_64/rh" >> /etc/yum.repos.d/centos6-devtoolset.repo  && \
