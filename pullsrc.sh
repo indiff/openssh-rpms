@@ -41,7 +41,8 @@ fi
 
 if [[ ! -f $OPENSSHSRC  ]]; then
   echo Get: $OPENSSHGITHUB/$OPENSSHSRC
-  wget --no-check-certificate $OPENSSHGITHUB/$OPENSSHSRC || \
+  # openssh-10.1.p1.tar.gz
+  wget -O openssh-$OPENSSHVER.tar.gz --no-check-certificate $OPENSSHGITHUB/$OPENSSHSRC || \
 	  echo "!!! Please download $OPENSSHSRC in $PWD by yourself."
 fi
 
