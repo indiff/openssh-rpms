@@ -5,12 +5,12 @@ name: Create amd64 release
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    #tags: [ "v*" ]
-    branches: [ "main" ]
-    paths:
-      - '**/*.yaml'
-      - '**/*.yml'
+  # push:
+  #   #tags: [ "v*" ]
+  #   branches: [ "main" ]
+  #   paths:
+  #     - '**/*.yaml'
+  #     - '**/*.yml'
     
 
   # Allows you to run this workflow manually from the Actions tab
