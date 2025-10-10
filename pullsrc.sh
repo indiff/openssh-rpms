@@ -22,6 +22,8 @@ arg1="${1:-}"
 
 source version.env	
 
+# https://github.com/openssh/openssh-portable/archive/refs/tags/V_10_1_P1.zip
+OPENSSHGITHUB=https://github.com/openssh/openssh-portable/archive/refs/tags/
 OPENSSHMIR=https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable
 OPENSSLMIR=https://www.openssl.org/source/
 OPENSSLMIR=${GH_PROXY}https://github.com/openssl/openssl/releases/download/openssl-${OPENSSLVER}/
@@ -35,6 +37,12 @@ if [[ ! -f $OPENSSLSRC ]]; then
   echo "Get:" $OPENSSLMIR/$OPENSSLSRC
   wget --no-check-certificate $OPENSSLMIR/$OPENSSLSRC || \
 	  echo "!!! Please download $OPENSSLSRC in $PWD by yourself."
+fi
+
+if [[ ! -f $OPENSSHSRC  ]]; then
+  echo Get: $OPENSSHGITHUB/$OPENSSHSRC
+  wget --no-check-certificate $OPENSSHGITHUB/$OPENSSHSRC || \
+	  echo "!!! Please download $OPENSSHSRC in $PWD by yourself."
 fi
 
 if [[ ! -f $OPENSSHSRC  ]]; then
