@@ -39,12 +39,12 @@ if [[ ! -f $OPENSSLSRC ]]; then
 	  echo "!!! Please download $OPENSSLSRC in $PWD by yourself."
 fi
 
-if [[ ! -f $OPENSSHSRC  ]]; then
-  echo Get: $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC
-  # openssh-10.1p1.tar.gz
-  wget -O $OPENSSHSRC --no-check-certificate $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC || \
-	  echo "!!! Please download $OPENSSHSRC in $PWD by yourself."
-fi
+# if [[ ! -f $OPENSSHSRC  ]]; then
+#   echo Get: $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC
+#   # openssh-10.1p1.tar.gz
+#   wget -O $OPENSSHSRC --no-check-certificate $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC || \
+# 	  echo "!!! Please download $OPENSSHSRC in $PWD by yourself."
+# fi
 
 if [[ ! -f $OPENSSHSRC  ]]; then
   echo Get: $OPENSSHMIR/$OPENSSHSRC
