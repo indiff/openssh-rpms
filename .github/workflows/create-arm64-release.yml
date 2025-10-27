@@ -34,7 +34,7 @@ jobs:
         run: |
           docker run --rm --platform linux/arm64 -v ${{ github.workspace }}/output:/data/amzn2023/RPMS/aarch64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:amazonlinux2023
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: al2023-arm64
           path: ${{ github.workspace }}/output
@@ -60,7 +60,7 @@ jobs:
         run: |
           docker run --rm --platform linux/arm64 -v ${{ github.workspace }}/output:/data/amzn2/RPMS/aarch64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:amazonlinux2
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: al2-arm64
           path: ${{ github.workspace }}/output
@@ -86,7 +86,7 @@ jobs:
         run: |
           docker run --rm --platform linux/arm64 -v ${{ github.workspace }}/output:/data/el7/RPMS/aarch64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:centos-stream9
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: el9-arm64
           path: ${{ github.workspace }}/output
@@ -112,7 +112,7 @@ jobs:
         run: |
           docker run --rm --platform linux/arm64 -v ${{ github.workspace }}/output:/data/el7/RPMS/aarch64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:centos-stream8
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: el8-arm64
           path: ${{ github.workspace }}/output
@@ -138,7 +138,7 @@ jobs:
         run: |
           docker run --rm --platform linux/arm64 -v ${{ github.workspace }}/output:/data/el7/RPMS/aarch64 ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:centos7
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: el7-arm64
           path: ${{ github.workspace }}/output
