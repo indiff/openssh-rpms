@@ -28,7 +28,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: "Compile Amazon Linux 2023 (arm64)"
         run: |
@@ -54,7 +54,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: "Compile Amazon Linux 2 (arm64)"
         run: |
@@ -80,7 +80,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: "Compile CentOS Stream 9 (arm64)"
         run: |
@@ -106,7 +106,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: "Compile CentOS Stream 8 (arm64)"
         run: |
@@ -132,7 +132,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: "Compile CentOS 7 (arm64)"
         run: |
