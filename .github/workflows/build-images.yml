@@ -54,7 +54,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push Amazon Linux 2023
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.amazonlinux
@@ -94,7 +94,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push Amazon Linux 2
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.amazonlinux
@@ -134,7 +134,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push Amazon Linux 1
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.amazonlinux
@@ -174,7 +174,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push CentOS Stream 9
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.centos-stream
@@ -214,7 +214,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push CentOS Stream 8
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.centos-stream
@@ -255,7 +255,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push CentOS 7
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.centos
@@ -296,7 +296,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push CentOS 6
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.centos
@@ -339,7 +339,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push CentOS 5
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.centos
@@ -379,7 +379,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push Rocky Linux 9
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.rockylinux
@@ -419,7 +419,7 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Build and push Rocky Linux 8
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./docker/Dockerfile.rockylinux
