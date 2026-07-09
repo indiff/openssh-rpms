@@ -1,16 +1,11 @@
-%{?!opensslver: %global opensslver 3.0.8}
-%{?!opensshver: %global opensshver 9.6p1}
-%{?!perlver: %global perlver 5.38.2}
+%{?!opensslver: %global opensslver 3.0.18}
+%{?!opensshver: %global opensshver 10.2p1}
+
 # Control openssl dependency
 # 0: build without openssl
 # 1: use system openssl
 # 2: build openssl statically
 %{!?with_openssl: %global with_openssl 2}
-
-# Force to build openssl statically for el5/6
-%if %{with_openssl} == 1
-%global with_openssl 2
-%endif
 
 %global ver %{?opensshver}
 %global rel %{?opensshpkgrel}%{?dist}
@@ -28,30 +23,11 @@
 # Do we want to disable building of gnome-askpass? (1=yes 0=no)
 %global no_gnome_askpass 0
 
-
 # Do we want smartcard support (1=yes 0=no)
 %global scard 0
 
 # Use GTK2 instead of GNOME in gnome-ssh-askpass
 %global gtk2 1
-
-# Use build6x options for older RHEL builds
-# RHEL 7 not yet supported
-%if 0%{?rhel} > 6
-%global build6x 0
-%else
-%global build6x 1
-%endif
-
-# Annotate content below to ENFORCE using SSL
-#%global without_openssl 0
-## build without openssl where 1.1.1 is not available
-#%if 0%{?fedora} <= 28
-#%global without_openssl 1
-#%endif
-#%if 0%{?rhel} <= 7
-#%global without_openssl 1
-#%endif
 
 # Do we want kerberos5 support (1=yes 0=no)
 %global kerberos5 0
@@ -65,15 +41,6 @@
 # RedHat <= 7.2 and Red Hat Advanced Server 2.1 are examples.
 # rpm -ba|--rebuild --define 'no_gtk2 1'
 %{?no_gtk2:%global gtk2 0}
-
-# Is this a build for RHL 6.x or earlier?
-%{?build_6x:%global build6x 1}
-
-# If this is RHL 6.x, the default configuration has sysconfdir in /usr/etc.
-%if %{build6x}
-%global _sysconfdir /etc
-%endif
-
 
 # Options for Smartcard support: (needs libsectok and openssl-engine)
 # rpm -ba|--rebuild --define "smartcard 1"
@@ -99,33 +66,31 @@ Release: %{rel}
 URL: https://www.openssh.com/portable.html
 Source0: https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: http://www.jmknoble.net/software/x11-ssh-askpass/x11-ssh-askpass-%{aversion}.tar.gz
-Source2: sshd.pam.el5
+Source2: sshd.pam.el7
 %if %{with_openssl} == 2
 Source3: https://www.openssl.org/source/openssl-%{opensslver}.tar.gz
-Source4: https://www.cpan.org/src/5.0/perl-%{perlver}.tar.gz
 %endif
+Patch100: openssh-aarch64-kernel-panic-fix.patch
+# systemd support
+Source7: sshd.sysconfig
+Source9: sshd@.service
+Source10: sshd.socket
+Source11: sshd.service
+Source12: sshd-keygen.service
+Source13: sshd-keygen
 
-# glibc-headers-2.5 have endian.h but didn't define htole64
-Patch0: have_endian.patch
 License: BSD
 Group: Applications/Internet
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
 Obsoletes: ssh
-%if %{build6x}
-PreReq: initscripts >= 5.00
-%else
 Requires: initscripts >= 5.20
-%endif
-#BuildRequires: perl
+BuildRequires: systemd-devel
+BuildRequires: perl
 %if %{with_openssl} == 1
 BuildRequires: openssl-devel
 %endif
 BuildRequires: /bin/login
-%if ! %{build6x}
 BuildRequires: glibc-devel, pam
-%else
-BuildRequires: /usr/include/security/pam_appl.h
-%endif
 %if ! %{no_x11_askpass}
 BuildRequires: /usr/include/X11/Xlib.h
 # Xt development tools
@@ -133,9 +98,7 @@ BuildRequires: libXt-devel
 # Provides xmkmf
 BuildRequires: imake
 # Rely on relatively recent gtk
-%if %{gtk2}
 BuildRequires: gtk2-devel
-%endif
 %endif
 %if ! %{no_gnome_askpass}
 BuildRequires: pkgconfig
@@ -156,9 +119,11 @@ Summary: The OpenSSH server daemon.
 Group: System Environment/Daemons
 Obsoletes: ssh-server
 Requires: openssh = %{version}-%{release}, chkconfig >= 0.9
-%if ! %{build6x}
 Requires: /etc/pam.d/system-auth
-%endif
+Requires(post): systemd-units
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+
 
 %package askpass
 Summary: A passphrase dialog for OpenSSH and X.
@@ -211,71 +176,24 @@ into and executing commands on a remote machine. This package contains
 an X11 passphrase dialog for OpenSSH and the GNOME GUI desktop
 environment.
 
-%global perl_version_ok %( \
-    if command -v perl >/dev/null 2>&1; then \
-        perl -e ' \
-            if ($] >= 5.010) { \
-                print "1"; \
-            } else { \
-                print "0"; \
-            }; \
-        ' \
-    else \
-        echo "0"; \
-    fi \
-)
-
-
 %prep
+
 %if ! %{no_x11_askpass}
 %setup -q -a 1
 %else
 %setup -q
 %endif
-
-# Applay a patch if glibc version is 2.5, not sure about other versions
-%global glibc_version %(ldd --version 2>&1 | head -n1 | grep -oP '[0-9.]+')
-echo "GLIBC version: %{glibc_version}"
-%if "%{glibc_version}" <= "2.5" && "%{opensshver}" == "9.9p2"
-%patch0 -p0
-%endif
+%patch100 -p0
 
 %if %{with_openssl} == 2
-
-# the OpenSSL build require perl version >= 5.10.0
-# the EL5 perl in repo is 5.8, have to build our own.
-%if "%{expand:%{perl_version_ok}}" == "0"
-
-%define perl_dir %{_builddir}/%{name}-%{version}/perl
-mkdir -p perl
-tar xfz %{SOURCE4} --strip-components=1 -C perl
-# perl is only needed during this build process.
-pushd perl
-mkdir -p perlbin
-./configure.gnu --prefix=$PWD/perlbin
-make %{?_smp_mflags}
-make install.perl
-export PATH=$PWD/perlbin/bin:$PATH
-popd
-
-# end of building perl
-%endif
-
-# Build OpenSSL
+# Add content below to use source code of OpenSSL
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl
 mkdir -p openssl
 tar xfz %{SOURCE3} --strip-components=1 -C openssl
 pushd openssl
-
-./config \
-%ifarch %{ix86}
-	linux-x86 \
-%endif
-	no-dgram no-tests shared zlib -fPIC
+./config no-dgram no-tests shared zlib -fPIC
 make %{?_smp_mflags}
 popd
-
-# end of with_openssl == 2
 %endif
 
 %build
@@ -288,9 +206,6 @@ CFLAGS="$RPM_OPT_FLAGS -Os"; export CFLAGS
 export LD_LIBRARY_PATH="%{openssl_dir}"
 %endif
 %configure \
-%ifarch %{ix86}
-	--host=i686-linux-gnu \
-%endif
 	--sysconfdir=%{_sysconfdir}/ssh \
 	--libexecdir=%{_libexecdir}/openssh \
 	--datadir=%{_datadir}/openssh \
@@ -300,14 +215,14 @@ export LD_LIBRARY_PATH="%{openssl_dir}"
 	--with-md5-passwords \
 	--mandir=%{_mandir} \
 	--with-mantype=man \
+        --with-systemd \
 	--disable-strip \
 %if %{with_openssl} == 2
 	--with-ssl-dir="%{openssl_dir}" \
 %endif
 %if %{with_openssl} == 0
 	--without-openssl \
-%endif
-%if %{with_openssl} > 0
+%else
 	--with-ssl-engine \
 %endif
 	--with-zlib \
@@ -320,12 +235,11 @@ export LD_LIBRARY_PATH="%{openssl_dir}"
 	--with-pam \
 %endif
 %if %{kerberos5}
-	 --with-kerberos5 \
+	 --with-kerberos5=$K5DIR \
 %endif
 
 
 %if %{with_openssl} == 2
-#perl -pi -e "s|-lcrypto|%{_libdir}/libcrypto.a|g" Makefile
 # Add OpenSSL library
 perl -pi -e "s|-lcrypto|%{openssl_dir}/libcrypto.a -lpthread|g" Makefile
 %endif
@@ -395,7 +309,19 @@ install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install -d $RPM_BUILD_ROOT%{_libexecdir}/openssh
 # Using custom PAM file
 install -m644 %{SOURCE2}     $RPM_BUILD_ROOT/etc/pam.d/sshd
+
+# init-v
 install -m755 contrib/redhat/sshd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/sshd
+
+# systemd support 
+install -d $RPM_BUILD_ROOT/etc/sysconfig/
+install -m644 %{SOURCE7} $RPM_BUILD_ROOT/etc/sysconfig/sshd
+install -m755 %{SOURCE13} $RPM_BUILD_ROOT/%{_sbindir}/sshd-keygen
+install -d -m755 $RPM_BUILD_ROOT/%{_unitdir}
+install -m644 %{SOURCE9} $RPM_BUILD_ROOT/%{_unitdir}/sshd@.service
+install -m644 %{SOURCE10} $RPM_BUILD_ROOT/%{_unitdir}/sshd.socket
+install -m644 %{SOURCE11} $RPM_BUILD_ROOT/%{_unitdir}/sshd.service
+install -m644 %{SOURCE12} $RPM_BUILD_ROOT/%{_unitdir}/sshd-keygen.service
 
 %if ! %{no_x11_askpass}
 install x11-ssh-askpass-%{aversion}/x11-ssh-askpass $RPM_BUILD_ROOT%{_libexecdir}/openssh/x11-ssh-askpass
@@ -455,17 +381,27 @@ fi
 	-g sshd -M -r sshd 2>/dev/null || :
 
 %post server
-/sbin/chkconfig --add sshd
-
-%postun server
-/sbin/service sshd condrestart > /dev/null 2>&1 || :
+# Fix permissions and ownership for private host key files.
+# This ensures that even if an old package had incorrect permissions (like 0640),
+# or if %config(noreplace) prevented %files from re-applying permissions during an upgrade,
+# these critical security permissions are corrected.
+for keyfile in \
+    /etc/ssh/ssh_host_rsa_key \
+    /etc/ssh/ssh_host_ed25519_key \
+    /etc/ssh/ssh_host_dsa_key \
+    /etc/ssh/ssh_host_ecdsa_key; do
+    if [ -f "$keyfile" ]; then
+        chmod 0600 "$keyfile"
+        chown root:root "$keyfile"
+    fi
+done
+%systemd_post sshd.service sshd.socket
 
 %preun server
-if [ "$1" = 0 ]
-then
-	/sbin/service sshd stop > /dev/null 2>&1 || :
-	/sbin/chkconfig --del sshd
-fi
+%systemd_preun sshd.service sshd.socket
+
+%postun server
+%systemd_postun_with_restart sshd.service
 
 %files
 %defattr(-,root,root)
@@ -514,6 +450,7 @@ fi
 %defattr(-,root,root)
 %dir %attr(0111,root,root) %{_var}/empty/sshd
 %attr(0755,root,root) %{_sbindir}/sshd
+%attr(0755,root,root) %{_sbindir}/sshd-keygen
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-session
 %attr(0755,root,root) %{_libexecdir}/openssh/sshd-auth
 %attr(0755,root,root) %{_libexecdir}/openssh/sftp-server
@@ -523,8 +460,13 @@ fi
 %attr(0644,root,root) %{_mandir}/man8/sftp-server.8*
 %attr(0755,root,root) %dir %{_sysconfdir}/ssh
 %attr(0600,root,root) %config(noreplace) %{_sysconfdir}/ssh/sshd_config
+%attr(0640,root,root) %config(noreplace) /etc/sysconfig/sshd
 %attr(0600,root,root) %config(noreplace) /etc/pam.d/sshd
 %attr(0755,root,root) %config /etc/rc.d/init.d/sshd
+%attr(0644,root,root) %{_unitdir}/sshd.service
+%attr(0644,root,root) %{_unitdir}/sshd@.service
+%attr(0644,root,root) %{_unitdir}/sshd.socket
+%attr(0644,root,root) %{_unitdir}/sshd-keygen.service
 %endif
 
 %if ! %{no_x11_askpass}

@@ -10,9 +10,15 @@ WORKDIR /data
 # Copy all files
 COPY . /data
 
+# Official webpage: https://developer.aliyun.com/mirror/rockylinux
 RUN if [ "$CHINA_MIRROR" != "0" ]; then \
-        # Official webpage: https://developer.aliyun.com/mirror/rockylinux
         MIRROR_URL="https://mirrors.aliyun.com/rockylinux" && \
+        sed -e 's|^mirrorlist=|#mirrorlist=|g' \
+            -e "s|^#baseurl=http://dl.rockylinux.org/\$contentdir|baseurl=$MIRROR_URL|g" \
+            -i.bak \
+            /etc/yum.repos.d/*.repo; \
+    else \
+        MIRROR_URL="https://mirrors.ocf.berkeley.edu/rocky" && \
         sed -e 's|^mirrorlist=|#mirrorlist=|g' \
             -e "s|^#baseurl=http://dl.rockylinux.org/\$contentdir|baseurl=$MIRROR_URL|g" \
             -i.bak \
@@ -21,13 +27,10 @@ RUN if [ "$CHINA_MIRROR" != "0" ]; then \
     rm -rf /var/cache/yum/ && \
     yum clean all && yum makecache timer && \
     yum groupinstall -y "Development Tools" && \
-    yum install -y perl rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel perl-Time-Piece && \
+    yum install -y wget autoconf automake gcc perl make rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel systemd-devel openssl-devel && \
     yum search devtoolset && \
     gcc -v && \
     make -v && \
-    yum clean all && \
-    find . -type f -name '.keep' -delete && \
-    sed -i "s/--define 'skip_x11_askpass 1'/--define \"debug_package %{nil}\"/" ./compile.sh && \
-    bash ./pullsrc.sh
+    yum clean all
 
-CMD ["bash", "/data/compile.sh"]
+CMD ["./docker/docker_compile.sh"]

@@ -1,16 +1,11 @@
 %{?!opensslver: %global opensslver 3.0.8}
 %{?!opensshver: %global opensshver 9.6p1}
-%{?!perlver: %global perlver 5.38.2}
+
 # Control openssl dependency
 # 0: build without openssl
 # 1: use system openssl
 # 2: build openssl statically
 %{!?with_openssl: %global with_openssl 2}
-
-# Force to build openssl statically for el5/6
-%if %{with_openssl} == 1
-%global with_openssl 2
-%endif
 
 %global ver %{?opensshver}
 %global rel %{?opensshpkgrel}%{?dist}
@@ -28,7 +23,6 @@
 # Do we want to disable building of gnome-askpass? (1=yes 0=no)
 %global no_gnome_askpass 0
 
-
 # Do we want smartcard support (1=yes 0=no)
 %global scard 0
 
@@ -42,16 +36,6 @@
 %else
 %global build6x 1
 %endif
-
-# Annotate content below to ENFORCE using SSL
-#%global without_openssl 0
-## build without openssl where 1.1.1 is not available
-#%if 0%{?fedora} <= 28
-#%global without_openssl 1
-#%endif
-#%if 0%{?rhel} <= 7
-#%global without_openssl 1
-#%endif
 
 # Do we want kerberos5 support (1=yes 0=no)
 %global kerberos5 0
@@ -73,7 +57,6 @@
 %if %{build6x}
 %global _sysconfdir /etc
 %endif
-
 
 # Options for Smartcard support: (needs libsectok and openssl-engine)
 # rpm -ba|--rebuild --define "smartcard 1"
@@ -99,14 +82,10 @@ Release: %{rel}
 URL: https://www.openssh.com/portable.html
 Source0: https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-%{version}.tar.gz
 Source1: http://www.jmknoble.net/software/x11-ssh-askpass/x11-ssh-askpass-%{aversion}.tar.gz
-Source2: sshd.pam.el5
+Source2: sshd.pam.el7
 %if %{with_openssl} == 2
 Source3: https://www.openssl.org/source/openssl-%{opensslver}.tar.gz
-Source4: https://www.cpan.org/src/5.0/perl-%{perlver}.tar.gz
 %endif
-
-# glibc-headers-2.5 have endian.h but didn't define htole64
-Patch0: have_endian.patch
 License: BSD
 Group: Applications/Internet
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
@@ -116,7 +95,7 @@ PreReq: initscripts >= 5.00
 %else
 Requires: initscripts >= 5.20
 %endif
-#BuildRequires: perl
+BuildRequires: perl
 %if %{with_openssl} == 1
 BuildRequires: openssl-devel
 %endif
@@ -133,9 +112,7 @@ BuildRequires: libXt-devel
 # Provides xmkmf
 BuildRequires: imake
 # Rely on relatively recent gtk
-%if %{gtk2}
 BuildRequires: gtk2-devel
-%endif
 %endif
 %if ! %{no_gnome_askpass}
 BuildRequires: pkgconfig
@@ -211,71 +188,23 @@ into and executing commands on a remote machine. This package contains
 an X11 passphrase dialog for OpenSSH and the GNOME GUI desktop
 environment.
 
-%global perl_version_ok %( \
-    if command -v perl >/dev/null 2>&1; then \
-        perl -e ' \
-            if ($] >= 5.010) { \
-                print "1"; \
-            } else { \
-                print "0"; \
-            }; \
-        ' \
-    else \
-        echo "0"; \
-    fi \
-)
-
-
 %prep
+
 %if ! %{no_x11_askpass}
 %setup -q -a 1
 %else
 %setup -q
 %endif
 
-# Applay a patch if glibc version is 2.5, not sure about other versions
-%global glibc_version %(ldd --version 2>&1 | head -n1 | grep -oP '[0-9.]+')
-echo "GLIBC version: %{glibc_version}"
-%if "%{glibc_version}" <= "2.5" && "%{opensshver}" == "9.9p2"
-%patch0 -p0
-%endif
-
 %if %{with_openssl} == 2
-
-# the OpenSSL build require perl version >= 5.10.0
-# the EL5 perl in repo is 5.8, have to build our own.
-%if "%{expand:%{perl_version_ok}}" == "0"
-
-%define perl_dir %{_builddir}/%{name}-%{version}/perl
-mkdir -p perl
-tar xfz %{SOURCE4} --strip-components=1 -C perl
-# perl is only needed during this build process.
-pushd perl
-mkdir -p perlbin
-./configure.gnu --prefix=$PWD/perlbin
-make %{?_smp_mflags}
-make install.perl
-export PATH=$PWD/perlbin/bin:$PATH
-popd
-
-# end of building perl
-%endif
-
-# Build OpenSSL
+# Add content below to use source code of OpenSSL
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl
 mkdir -p openssl
 tar xfz %{SOURCE3} --strip-components=1 -C openssl
 pushd openssl
-
-./config \
-%ifarch %{ix86}
-	linux-x86 \
-%endif
-	no-dgram no-tests shared zlib -fPIC
+./config shared zlib -fPIC
 make %{?_smp_mflags}
 popd
-
-# end of with_openssl == 2
 %endif
 
 %build
@@ -288,9 +217,6 @@ CFLAGS="$RPM_OPT_FLAGS -Os"; export CFLAGS
 export LD_LIBRARY_PATH="%{openssl_dir}"
 %endif
 %configure \
-%ifarch %{ix86}
-	--host=i686-linux-gnu \
-%endif
 	--sysconfdir=%{_sysconfdir}/ssh \
 	--libexecdir=%{_libexecdir}/openssh \
 	--datadir=%{_datadir}/openssh \
@@ -306,8 +232,7 @@ export LD_LIBRARY_PATH="%{openssl_dir}"
 %endif
 %if %{with_openssl} == 0
 	--without-openssl \
-%endif
-%if %{with_openssl} > 0
+%else
 	--with-ssl-engine \
 %endif
 	--with-zlib \
@@ -320,12 +245,11 @@ export LD_LIBRARY_PATH="%{openssl_dir}"
 	--with-pam \
 %endif
 %if %{kerberos5}
-	 --with-kerberos5 \
+	 --with-kerberos5=$K5DIR \
 %endif
 
 
 %if %{with_openssl} == 2
-#perl -pi -e "s|-lcrypto|%{_libdir}/libcrypto.a|g" Makefile
 # Add OpenSSL library
 perl -pi -e "s|-lcrypto|%{openssl_dir}/libcrypto.a -lpthread|g" Makefile
 %endif
@@ -368,6 +292,8 @@ mkdir -p -m755 $RPM_BUILD_ROOT%{_var}/empty/sshd
 
 make install DESTDIR=$RPM_BUILD_ROOT
 # Modify sshd config file.
+sed -E -i 's/^#?( ?)*GSSAPIAuthentication.*$/GSSAPIAuthentication yes/' $RPM_BUILD_ROOT/etc/ssh/sshd_config
+sed -E -i 's/^#?( ?)*GSSAPICleanupCredentials.*$/GSSAPICleanupCredentials no/' $RPM_BUILD_ROOT/etc/ssh/sshd_config
 cat << EOF >> $RPM_BUILD_ROOT/etc/ssh/sshd_config
 %if %{with_openssl} > 0
 PubkeyAcceptedAlgorithms +ssh-rsa

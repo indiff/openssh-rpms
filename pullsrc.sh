@@ -20,17 +20,17 @@ arg1="${1:-}"
 # allow command fail:
 # fail_command || true
 
-source version.env	
+source version.env
+[[ -f version-local.env ]] && source version-local.env
 
 # https://github.com/openssh/openssh-portable/archive/refs/tags/V_10_1_P1.zip
 OPENSSHGITHUB=https://github.com/openssh/openssh-portable/archive/refs/tags/
 OPENSSHMIR=https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable
 OPENSSLMIR=https://www.openssl.org/source/
-OPENSSLMIR=${GH_PROXY}https://github.com/openssl/openssl/releases/download/openssl-${OPENSSLVER}/
+OPENSSLMIR=${GH_PROXY:-}https://github.com/openssl/openssl/releases/download/openssl-${OPENSSLVER}/
 ASKPASSMIR=https://src.fedoraproject.org/repo/pkgs/openssh/x11-ssh-askpass-1.2.4.1.tar.gz/8f2e41f3f7eaa8543a2440454637f3c3
 PERLMIR=https://www.cpan.org/src/5.0
 
-rpm -q wget >/dev/null || yum install -y wget
 mkdir -p downloads
 pushd downloads
 if [[ ! -f $OPENSSLSRC ]]; then
@@ -38,13 +38,6 @@ if [[ ! -f $OPENSSLSRC ]]; then
   wget --no-check-certificate $OPENSSLMIR/$OPENSSLSRC || \
 	  echo "!!! Please download $OPENSSLSRC in $PWD by yourself."
 fi
-
-# if [[ ! -f $OPENSSHSRC  ]]; then
-#   echo Get: $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC
-#   # openssh-10.1p1.tar.gz
-#   wget -O $OPENSSHSRC --no-check-certificate $OPENSSHGITHUB/$OPENSSH_GITHUB_SRC || \
-# 	  echo "!!! Please download $OPENSSHSRC in $PWD by yourself."
-# fi
 
 if [[ ! -f $OPENSSHSRC  ]]; then
   echo Get: $OPENSSHMIR/$OPENSSHSRC
@@ -58,7 +51,7 @@ if [[ ! -f $ASKPASSSRC  ]]; then
 	  echo "!!! Please download $ASKPASSSRC in $PWD by yourself."
 fi
 
-if [[ $($__dir/compile.sh GETEL) == "el5" && ! -f $PERLSRC ]]; then
+if [[ $($__dir/compile.sh GETEL) == "el5" || ${ALL:-0} == 1 && ! -f $PERLSRC ]]; then
   echo Get: $PERLMIR/$PERLSRC
   wget --no-check-certificate $PERLMIR/$PERLSRC || \
 	  echo "!!! Please download $PERLSRC in $PWD by yourself."
