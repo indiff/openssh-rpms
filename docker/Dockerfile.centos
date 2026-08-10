@@ -16,6 +16,8 @@ RUN export MIRROR="$MIRROR" && \
     if [ "$VERSION_NUM" = "8" ]; then \
         yum install -y perl perl-IPC-Cmd perl-Time-Piece systemd-devel openssl-devel && \
         yum install -y 'dnf-command(config-manager)' && \
+        yum config-manager --set-enabled appstream powertools || true && \
+        yum makecache && \
         yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
         export PATH=/opt/rh/devtoolset-14/root/bin:$PATH && \
         rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
