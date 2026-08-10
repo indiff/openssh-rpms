@@ -40,11 +40,11 @@ GUESS_DIST() {
     local dist=$(rpm --eval '%{?dist}' | tr -d '.')
 
     # fallback to el7
-    [[ $dist == "el9" ]] && dist="el8"
-    [[ $dist == "el8" ]] && dist="el8"
-    [[ $dist == "an8" ]] && dist="el8" # Anolis 8
+    [[ $dist == "el9" ]] && dist="el7"
+    [[ $dist == "el8" ]] && dist="el7"
+    [[ $dist == "an8" ]] && dist="el7" # Anolis 8
     [[ $dist == "an7" ]] && dist="el7" # Anolis 7
-    [[ $dist == uel* ]] && dist="el8"  # UOS20+
+    [[ $dist == uel* ]] && dist="el7"  # UOS20+
 
     [[ -n $dist ]] && echo $dist && return 0
 
@@ -59,23 +59,22 @@ GUESS_DIST() {
     # centos 7 uses glibc 2.17
     [[ $glibcver -eq 217 ]] && echo 'el7' && return 0
 
-    # centos 8 uses glibc 2.28, not yet to be in a seprate dir
-    [[ $glibcver -eq 228 ]] && echo 'el8' && return 0
+    # centos 8 uses glibc 2.28, also map to el7
+    [[ $glibcver -eq 228 ]] && echo 'el7' && return 0
 
     # some centos-like dists ships higher version of glibc, fallback to el7
-    [[ $glibcver -gt 217 ]] && echo 'el8' && return 0
+    [[ $glibcver -gt 217 ]] && echo 'el7' && return 0
 }
 
 TOPDIR_SELECT() {
     local DISTVER=$(GUESS_DIST)
     case $DISTVER in
-        el8)
-            rpmtopdir=el7
-            WITH_OPENSSL=${WITH_OPENSSL:-1}
-            ;;
         el7)
             rpmtopdir=el7
-            WITH_OPENSSL=${WITH_OPENSSL:-2}
+            if [[ -z ${WITH_OPENSSL+x} ]]; then
+                local opensslver=$(rpm -q openssl --qf "%{VERSION}" 2>/dev/null | cut -d. -f1)
+                [[ $opensslver -ge 3 ]] && WITH_OPENSSL=1 || WITH_OPENSSL=2
+            fi
             ;;
         el6)
             rpmtopdir=el6
@@ -106,26 +105,36 @@ BUILD_RPM() {
           $OPENSSLSRC \
           $ASKPASSSRC \
         )
+    # UOS20 build: prefix PKGREL with "uos20-" so the resulting RPMs are
+    # distinguishable from the standard build (e.g. PKGREL `1` becomes
+    # `uos20-1`, not `uos201`), and pass `uos20 1` to the spec to enable
+    # the kernel-panic patch.
+    local _pkgrel="${PKGREL:-1}"
+    if [[ ${UOS20:-0} == 1 ]]; then
+        _pkgrel="uos20-${_pkgrel}"
+    fi
     local RPMBUILDOPTS=( \
         --define "with_openssl ${WITH_OPENSSL:-2}" \
         --define "opensslver ${OPENSSLVER}" \
         --define "opensshver ${OPENSSHVER}" \
-        --define "opensshpkgrel ${PKGREL:-1}" \
+        --define "opensshpkgrel ${_pkgrel}" \
         --define 'debug_package %{nil}' \
         --define 'no_gtk2 1' \
         --define 'skip_gnome_askpass 1' \
         --define 'skip_x11_askpass 1' \
         )
+    [[ ${UOS20:-0} == 1 ]] && RPMBUILDOPTS+=('--define' 'uos20 1')
 
     # EL5 dist fixes
     if [[ $rpmtopdir == *el5 ]]; then
         SOURCES+=($PERLSRC)
+
+        # Hack: fake the perl src when perl is ready already(docker images)
+        [[ $(perl -e 'print $] >= 5.010 ? 1 : 0') -eq 1 ]] && \
+    	    touch ./downloads/$PERLSRC
+    
         RPMBUILDOPTS+=('--define' "perlver ${PERLVER}" '--define' 'dist .el5')
         export CC=gcc44
-        if [[ ${M32:-0} != 0 ]]; then
-               RPMBUILDOPTS+=('--target' i686)
-               export CFLAGS=-m32 LDFLAGS=-m32
-        fi
     fi
 
     # add dist variable if not defined
@@ -139,7 +148,14 @@ BUILD_RPM() {
         install -v -m666 $__dir/downloads/$fn ./SOURCES/
     done
 
-    rpmbuild -ba ./SPECS/${SPECFILE:-openssh.spec} "${RPMBUILDOPTS[@]}"
+    if [[ ${M32:-0} != 0 ]]; then
+        local SETARCH="setarch i386"
+        RPMBUILDOPTS+=('--target' i686)
+        export CFLAGS="${CFLAGS:-} -m32" LDFLAGS="${LDFLAGS:-} -m32"
+    fi
+
+    ${SETARCH:-} \
+    rpmbuild -bb ./SPECS/${SPECFILE:-openssh.spec} "${RPMBUILDOPTS[@]}"
     
     if [[ $? -ne 0 ]]; then
         echo "Error: rpmbuild failed with exit code $?"

@@ -21,12 +21,20 @@ jobs:
           - tag: aarch64_el7
             el: "7"
             arch: aarch64
+            artifact: rpm-el7-aarch64
           - tag: aarch64_el8
             el: "8"
             arch: aarch64
+            artifact: rpm-el8-aarch64
           - tag: aarch64_el9
             el: "9"
             arch: aarch64
+            artifact: rpm-el9-aarch64
+          - tag: aarch64_el8
+            el: "uos20"
+            arch: aarch64
+            uos20: "1"
+            artifact: rpm-uos20-aarch64
 
     steps:
       - name: Checkout repository
@@ -63,6 +71,7 @@ jobs:
         run: |
           docker run --rm \
             -v $(pwd):/data \
+            -e "UOS20=${{ matrix.uos20 }}" \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.tag }}
 
       - name: Upload RPM artifacts
@@ -83,15 +92,24 @@ jobs:
           - tag: el9
             el: "9"
             arch: x86_64
+            artifact: rpm-el9-x86_64
           - tag: el8
             el: "8"
             arch: x86_64
+            artifact: rpm-el8-x86_64
           - tag: el7
             el: "7"
             arch: x86_64
+            artifact: rpm-el7-x86_64
           - tag: el6
             el: "6"
             arch: x86_64
+            artifact: rpm-el6-x86_64
+          - tag: el8
+            el: "uos20"
+            arch: x86_64
+            uos20: "1"
+            artifact: rpm-uos20-x86_64
 
     steps:
       - name: Checkout repository
@@ -101,7 +119,7 @@ jobs:
           persist-credentials: false
 
       - name: Run pullsrc.sh
-        run: env ALL=1 ./pullsrc.sh
+        run: ./pullsrc.sh
 
       - name: Generate version-local.env
         run: |
@@ -125,12 +143,13 @@ jobs:
         run: |
           docker run --rm \
             -v $(pwd):/data \
+            -e "UOS20=${{ matrix.uos20 }}" \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.tag }}
 
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: rpm-el${{ matrix.el }}-${{ matrix.arch }}
+          name: ${{ matrix.artifact }}
           path: output/*.rpm
           if-no-files-found: ignore
 
@@ -145,9 +164,11 @@ jobs:
           - m32: "0"
             el: "5"
             arch: x86_64
+            artifact: rpm-el5-x86_64
           - m32: "1"
             el: "5"
             arch: i686
+            artifact: rpm-el5-i686
 
     steps:
       - name: Checkout repository
@@ -157,7 +178,7 @@ jobs:
           persist-credentials: false
 
       - name: Run pullsrc.sh
-        run: env ALL=1 ./pullsrc.sh
+        run: ./pullsrc.sh
 
       - name: Generate version-local.env
         run: |

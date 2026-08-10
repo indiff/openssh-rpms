@@ -54,7 +54,7 @@
 #%endif
 
 # Do we want kerberos5 support (1=yes 0=no)
-%global kerberos5 0
+%global kerberos5 1
 
 # Reserve options to override askpass settings with:
 # rpm -ba|--rebuild --define 'skip_xxx 1'
@@ -105,8 +105,6 @@ Source3: https://www.openssl.org/source/openssl-%{opensslver}.tar.gz
 Source4: https://www.cpan.org/src/5.0/perl-%{perlver}.tar.gz
 %endif
 
-# glibc-headers-2.5 have endian.h but didn't define htole64
-Patch0: have_endian.patch
 License: BSD
 Group: Applications/Internet
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
@@ -144,6 +142,9 @@ BuildRequires: pkgconfig
 BuildRequires: krb5-devel
 BuildRequires: krb5-libs
 %endif
+Patch0: have_endian.patch
+Patch100: 10.4-fix-gssapi.patch
+
 
 %package clients
 Summary: OpenSSH clients.
@@ -211,20 +212,7 @@ into and executing commands on a remote machine. This package contains
 an X11 passphrase dialog for OpenSSH and the GNOME GUI desktop
 environment.
 
-%global perl_version_ok %( \
-    if command -v perl >/dev/null 2>&1; then \
-        perl -e ' \
-            if ($] >= 5.010) { \
-                print "1"; \
-            } else { \
-                print "0"; \
-            }; \
-        ' \
-    else \
-        echo "0"; \
-    fi \
-)
-
+%global perl_version_ok %(perl -e 'exit($] < 5.010)' && echo 1 || echo 0)
 
 %prep
 %if ! %{no_x11_askpass}
@@ -236,8 +224,15 @@ environment.
 # Applay a patch if glibc version is 2.5, not sure about other versions
 %global glibc_version %(ldd --version 2>&1 | head -n1 | grep -oP '[0-9.]+')
 echo "GLIBC version: %{glibc_version}"
+
 %if "%{glibc_version}" <= "2.5" && "%{opensshver}" == "9.9p2"
+# glibc-headers-2.5 have endian.h but didn't define htole64
 %patch0 -p0
+%endif
+
+# Apply GSSAPI option path for 10.4p1
+%if "%{opensshver}" == "10.4p1"
+%patch100 -p1
 %endif
 
 %if %{with_openssl} == 2
@@ -281,6 +276,27 @@ popd
 %build
 %if %{rescue}
 CFLAGS="$RPM_OPT_FLAGS -Os"; export CFLAGS
+%endif
+
+# ==============================================================================
+# HACK: Fix conflicting 'krb5_free_error_message' macros under older distros (EL5)
+# When statically building against OpenSSL 3.x with Kerberos enabled, the ancient 
+# krb5 headers conflict with OpenSSL 3's new/deprecated APIs. This causes the 
+# './configure' compiler test to fail linking, making it mistakenly believe that 
+# the system lacks 'krb5_free_error_message'. 
+#
+# Consequently, OpenSSH injects a fallback macro:
+#   #define krb5_free_error_message(a,b) do { } while(0)
+# which directly results in syntax compilation errors later inside krb5.h.
+#
+# By forcing these autoconf cache variables to 'yes', we bypass the broken 
+# configure test and prevent the conflicting macro injection, as the functions 
+# are indeed natively present in the system's krb5-devel library.
+# ==============================================================================
+%global openssl_major %(echo "%{opensslver}" | cut -d. -f1)
+%if %{kerberos5} && %{openssl_major} >= 3
+    export ac_cv_func_krb5_free_error_message=yes
+    export ac_cv_func_krb5_get_error_message=yes
 %endif
 
 %if %{with_openssl} == 2

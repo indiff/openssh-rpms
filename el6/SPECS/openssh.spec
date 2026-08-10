@@ -128,6 +128,7 @@ BuildRequires: pkgconfig
 BuildRequires: krb5-devel
 BuildRequires: krb5-libs
 %endif
+Patch100: 10.4-fix-gssapi.patch
 
 %package clients
 Summary: OpenSSH clients.
@@ -203,6 +204,10 @@ environment.
 %setup -q
 %endif
 
+# Apply GSSAPI option path for 10.4p1
+%if "%{opensshver}" == "10.4p1"
+%patch100 -p1
+%endif
 %if %{with_openssl} == 2
 # add gcc version and build time
 # 计算混淆后的版本号并输出到控制台

@@ -21,7 +21,7 @@ Similar Project: [Backport OpenSSH for Debian / Ubuntu distros](https://github.c
 | Amazon Linux   | 1              | EL 6                        |
 | Amazon Linux   | 2              | EL 7                        |
 | Amazon Linux   | 2023           | EL 9                        |
-| UnionTech UOS  | V20            | EL 8                        |
+| UnionTech UOS  | V20            | **UOS20**                   |
 | openEuler      | 20.03          | EL 8                        |
 | openEuler      | 22.03          | EL 8                        |
 | openEuler      | 24.03          | EL 9                        |
@@ -68,13 +68,23 @@ yum install -y gcc44
 
 ### Download RPMs
 
-You can download the needed RPMs from the Release, or use a simple script to download.
-
-The following example filters out files with `contains("el7") and contains("x86_64")` to download.
+You can download the needed RPMs from the GitHub Release using the GitHub
+API. The script below auto-detects your architecture and EL version from
+the running system, then fetches the matching asset from the latest
+release.
 
 ```bash
+ARCH=$(uname -m)
+# Read the system's own rpm dist tag (.el8 -> el8, .el7 -> el7, ...).
+# Override for non-elN dists (e.g. UOS 20) or when auto-detect fails.
+# If unsure which EL value to use, see the "Supported (tested) Distro"
+# table at the top of this README.
+EL=$(rpm --eval '%{?dist}' 2>/dev/null | grep -oE 'el[0-9]+' | head -1)
+[[ -z "$EL" ]] && EL=el7
+
 curl -s https://api.github.com/repos/boypt/openssh-rpms/releases/latest \
-| jq -r '.assets[] | select(.name | ascii_downcase | contains("el7") and contains("x86_64")) | .browser_download_url' \
+| jq -r --arg el "$EL" --arg arch "$ARCH" \
+    '.assets[] | select(.name | ascii_downcase | contains($el) and contains($arch)) | .browser_download_url' \
 | wget -i - --show-progress -c
 
 ```
@@ -146,6 +156,33 @@ For more details, see [docker/README.md](docker/README.md)
 ### Built without OPENSSL
 
 When built with `WITH_OPENSSL=0`, `ssh-rsa` keys are not supported. But the RPMs are much smaller, and the built process is much faster.
+
+### Build for uniontech UOS 20
+
+UOS 20 kernels have a `do_dup2()` bug that triggers a kernel NULL pointer
+dereference panic when `sshd` re-execs:
+
+```
+BUG: unable to handle kernel NULL pointer dereference at 000000000000003f
+IP: filp_close+0x9/0x70
+Call Trace: do_dup2+xxx sys_dup2 entry_SYSCALL_64
+PID: xxx Comm: sshd
+```
+
+To apply the workaround (`el7/SOURCES/openssh-uos20-kernel-panic-fix.patch`,
+which closes the target fd before each `dup2()` in `sshd.c`), set
+`UOS20=1`:
+
+```bash
+UOS20=1 ./compile.sh el7
+```
+
+The flag also prefixes `PKGREL` with `uos20-` so the resulting RPMs are
+distinguishable from the standard build (e.g. PKGREL `1` becomes `uos20-1`,
+producing `openssh-10.4p1-1.uos20-1.el7.x86_64.rpm`). The patch is only
+applied when the `uos20` macro is set, so ordinary EL7/8/9 builds are
+unaffected. For the Docker-based build, see
+[docker/README.md](docker/README.md#uos-20-variant-el7-family).
 
 ### Install on uniontech UOS 20
 
