@@ -18,6 +18,7 @@ RUN if [ "$VERSION_NUM" = "8" ]; then \
             -i.bak \
             /etc/yum.repos.d/CentOS-*.repo && \
         yum install -y perl 'dnf-command(config-manager)' && \
+        yum config-manager --set-enabled devel || yum config-manager --set-enabled crb || true && \
         yum config-manager --set-enabled powertools; \
     else \
         if [ "$MIRROR" != "0" ]; then \
