@@ -12,7 +12,7 @@ COPY ./docker/ /data/docker/
 RUN export MIRROR="$MIRROR" && \
     bash ./docker/modify_yum_source.sh && \
     yum groupinstall -y "Development Tools" && \
-    yum install -y curl zip unzip imake rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
+    yum install -y curl zip unzip rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
     if [ "$VERSION_NUM" = "8" ]; then \
         yum install -y perl perl-IPC-Cmd perl-Time-Piece systemd-devel openssl-devel && \
         yum install -y 'dnf-command(config-manager)' && \
