@@ -158,6 +158,7 @@ jobs:
     permissions:
       contents: read
       packages: read
+    if: false
     strategy:
       matrix:
         include:
@@ -213,7 +214,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: [build-arm64, build-amd64, build-el5]
+    needs: [build-arm64, build-amd64] # , build-el5
     runs-on: ubuntu-latest
     permissions:
       contents: write

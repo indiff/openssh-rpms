@@ -37,10 +37,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - tag_suffix: el5
-            dockerfile: ./docker/Dockerfile.centos5
-            build_args: |
-              MIRROR=0
+          # - tag_suffix: el5
+          #   dockerfile: ./docker/Dockerfile.centos5
+          #   build_args: |
+          #     MIRROR=0
           - tag_suffix: el6
             dockerfile: ./docker/Dockerfile.centos
             build_args: |
