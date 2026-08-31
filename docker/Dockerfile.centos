@@ -1,7 +1,6 @@
 ARG VERSION_NUM="7"
 FROM centos:$VERSION_NUM
 ARG VERSION_NUM
-ARG MIRROR=0
 LABEL Author="Rex Zhou <zrx879582094@gmail.com>"
 
 WORKDIR /data
@@ -10,7 +9,7 @@ WORKDIR /data
 COPY ./docker/ /data/docker/
 
 RUN export MIRROR="$MIRROR" && \
-    bash ./docker/modify_yum_source.sh && \
+    bash ./docker/modify_vault_source.sh && \
     yum groupinstall -y "Development Tools" && \
     yum install -y curl zip unzip rpm-build pam-devel krb5-devel zlib-devel libXt-devel libX11-devel gtk2-devel && \
     if [ "$VERSION_NUM" = "8" ]; then \

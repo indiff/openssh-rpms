@@ -37,30 +37,25 @@ jobs:
     strategy:
       matrix:
         include:
-          # - tag_suffix: el5
-          #   dockerfile: ./docker/Dockerfile.centos5
-          #   build_args: |
-          #     MIRROR=0
+          #- tag_suffix: el5
+          #  dockerfile: ./docker/Dockerfile.centos5
+          #  build_args: |
           - tag_suffix: el6
             dockerfile: ./docker/Dockerfile.centos
             build_args: |
               VERSION_NUM=6
-              MIRROR=0
           - tag_suffix: el7
             dockerfile: ./docker/Dockerfile.centos
             build_args: |
               VERSION_NUM=7
-              MIRROR=0
           - tag_suffix: el8
-            dockerfile: ./docker/Dockerfile.centos
+            dockerfile: ./docker/Dockerfile.centos-stream
             build_args: |
               VERSION_NUM=8
-              MIRROR=0
           - tag_suffix: el9
             dockerfile: ./docker/Dockerfile.centos-stream
             build_args: |
               VERSION_NUM=9
-              MIRROR=0
 
     steps:
       - name: Checkout repository
@@ -73,10 +68,6 @@ jobs:
         if: matrix.tag_suffix == 'el5'
         run: |
           env DOCKERBUILD=1 ./pullsrc.sh
-
-      - name: Replace Mirror URL
-        run: |
-          sed -i 's|mirrors.\+\.cn|mirror.centos.org|g' ./docker/*
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -111,17 +102,14 @@ jobs:
             dockerfile: ./docker/Dockerfile.centos
             build_args: |
               VERSION_NUM=7
-              MIRROR=0
           - tag_suffix: aarch64_el8
             dockerfile: ./docker/Dockerfile.centos-stream
             build_args: |
               VERSION_NUM=8
-              MIRROR=0
           - tag_suffix: aarch64_el9
             dockerfile: ./docker/Dockerfile.centos-stream
             build_args: |
               VERSION_NUM=9
-              MIRROR=0
 
     steps:
       - name: Checkout repository
@@ -129,10 +117,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-
-      - name: Replace Mirror URL
-        run: |
-          sed -i 's|mirrors.\+\.cn|mirror.centos.org|g' ./docker/*
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
