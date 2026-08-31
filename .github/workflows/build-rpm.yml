@@ -233,8 +233,18 @@ jobs:
           find artifacts -mindepth 1 -maxdepth 1 -type d
 
       - name: Repackage artifacts with prefixed names
+        id: repackage
         run: |
-          TAG=${{ github.ref_name }}
+          source version.env
+          sudo timedatectl set-timezone Asia/Shanghai
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            export build_timestamp="$(date +'%Y%m%d_%H%M')"
+            TAG="OpenSSH_${OPENSSHVER}_${build_timestamp}"
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          else
+            TAG="OpenSSH_${{ github.ref_name }}_${build_timestamp}"
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
           mkdir -p release-assets
           for dir in artifacts/*/; do
             artifact_name=$(basename "$dir")
@@ -250,6 +260,8 @@ jobs:
         with:
           files: release-assets/*.zip
           generate_release_notes: true
+          tag_name: ${{ steps.repackage.outputs.tag }}   # ← 关键：显式指定 tag
+          target_commitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
