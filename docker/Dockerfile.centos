@@ -18,8 +18,8 @@ RUN export MIRROR="$MIRROR" && \
         yum install -y 'dnf-command(config-manager)' && \
         yum config-manager --set-enabled appstream powertools || true && \
         yum makecache && \
-        yum install -y gcc-toolset-14-gcc gcc-toolset-14-gcc-c++ && \
-        export PATH=/opt/rh/devtoolset-14/root/bin:$PATH && \
+        yum install -y gcc-toolset-11-gcc gcc-toolset-11-gcc-c++ && \
+        export PATH=/opt/rh/devtoolset-11/root/bin:$PATH && \
         rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
         rm -f /usr/bin/gcc && \
         rm -f /usr/bin/g++ && \
