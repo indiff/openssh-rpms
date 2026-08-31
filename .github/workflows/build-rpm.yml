@@ -69,6 +69,7 @@ jobs:
 
       - name: Run ${{ matrix.tag }}
         run: |
+          chmod +x docker/docker_compile.sh
           docker run --rm \
             -v $(pwd):/data \
             -e "UOS20=${{ matrix.uos20 }}" \
