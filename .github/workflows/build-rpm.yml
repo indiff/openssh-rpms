@@ -223,7 +223,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      
+
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
@@ -234,7 +234,7 @@ jobs:
           echo "Downloaded artifact directories:"
           find artifacts -mindepth 1 -maxdepth 1 -type d
 
-      - name: Repackage artifacts with prefixed names
+      - name: Repackage artifacts and release
         id: repackage
         run: |
           source version.env
@@ -256,14 +256,95 @@ jobs:
           done
           echo "Release assets:"
           ls -la release-assets
+          echo -e "> Automated release OpenSSH_${OPENSSHVER} with OpenSSL_${OPENSSLVER}.\n" > ${GITHUB_WORKSPACE}/RELEASE.md
+          cat <<'EOF' >> ${GITHUB_WORKSPACE}/RELEASE.md
+          # Proxy download:
+          ```bash
+          curl -#Lo openssh-indiff.zip "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip" --insecure
+          ```
+          ```bash
+          wget --no-check-certificate "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip" -O openssh-indiff.zip 
+          ```
+            
+          # Direct download:
+          ```bash         
+          curl -#Lo openssh-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          ```
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v3
-        with:
-          files: release-assets/*.zip
-          generate_release_notes: true
-          tag_name: ${{ steps.repackage.outputs.tag }}   # ← 关键：显式指定 tag
-          target_commitish: ${{ github.sha }}
+          ```
+          unzip openssh-indiff.zip -d openssh
+          cd openssh
+
+          # Backup current SSH config
+          [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
+
+          # Install rpm packages. Exclude all debug packages.
+          find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --allowerasing
+
+          # fix by packages.
+          yum install -y libICE libSM libX11 libXt
+          yum update -y
+          find . ! -name '*debug*' -name '*.rpm' | xargs sudo yum --disablerepo=* localinstall -y --skip-broken
+
+          # install by rpm 
+          yum erase openssh-askpass openssh-keycat openssh-cavs openssh-askpass openssh-askpass-gnome openssh-debuginfo
+          rpm -ivh --force --nodeps --replacepkgs --replacefiles openssh-*.rpm
+
+          # in case host key files got permissions too open.
+          chmod -v 600 /etc/ssh/ssh_host_*_key
+
+          # For CentOS7+:
+          # in some cases previously installed systemd unit file is left on disk after upgrade.
+          # causes systemd mixing unit files and initscripts units provided by this package.
+          if [[ -d /run/systemd/system && -f /usr/lib/systemd/system/sshd.service ]]; then
+              mv /usr/lib/systemd/system/sshd.service /usr/lib/systemd/system/sshd.service.$(date +%Y%m%d)
+              systemctl daemon-reload
+          fi
+
+          # Check Installed version:
+          ssh -V && /usr/sbin/sshd -V
+
+          # Restart service
+          service sshd restart
+          ```
+
+          ```
+          cat << 'EOF' > /etc/ssh/sshd_config
+          Port 22
+          AddressFamily inet
+          PubkeyAcceptedAlgorithms +ssh-rsa
+          PermitRootLogin yes
+          PasswordAuthentication yes
+          UseDNS no
+          UsePAM yes
+          TCPKeepAlive yes
+          ClientAliveInterval 60
+          ClientAliveCountMax 3
+          #Subsystem sftp  internal-sftp
+          Subsystem sftp  /usr/libexec/openssh/sftp-server
+          KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
+          shitshit
+          ```
+          EOF
+          sed -i "s/shitver/${OPENSSHVER}/g" RELEASE.md
+          sed -i "s/shitstamp/${build_timestamp}/g" RELEASE.md
+          sed -i 's/shitshit/EOF/g' RELEASE.md
+          GITHUB_REF=${{ github.ref }}
+          TAGNAME="OpenSSH_${OPENSSHVER}_${build_timestamp}"
+          NAME="${TAGNAME}"
+          git tag -l --format='%(contents)' "${TAGNAME}" | tee -a ${GITHUB_WORKSPACE}/RELEASE.md
+          gh release delete --cleanup-tag --yes "$TAGNAME" || true
+          gh release create "$TAGNAME" --target "main" -F ${GITHUB_WORKSPACE}/RELEASE.md --title "$NAME" ${GITHUB_WORKSPACE}/release-assets/*
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+
+      # - name: Create Release
+      #   uses: softprops/action-gh-release@v3
+      #   with:
+      #     files: release-assets/*.zip
+      #     generate_release_notes: true
+      #     tag_name: ${{ steps.repackage.outputs.tag }}   # ← 关键：显式指定 tag
+      #     target_commitish: ${{ github.sha }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
