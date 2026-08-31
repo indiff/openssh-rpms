@@ -19,18 +19,18 @@ RUN export MIRROR="$MIRROR" && \
         yum config-manager --set-enabled appstream powertools || true && \
         yum makecache && \
         yum install -y gcc-toolset-11-gcc gcc-toolset-11-gcc-c++ && \
-        export PATH=/opt/rh/devtoolset-11/root/bin:$PATH && \
+		export PATH=/opt/rh/gcc-toolset-11/root/usr/bin:$PATH && \
         rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
         rm -f /usr/bin/gcc && \
         rm -f /usr/bin/g++ && \
         rm -f /usr/bin/cpp && \
         rm -f /usr/bin/gfortran && \
         rm -f /usr/bin/make && \
-        ln -s /opt/rh/devtoolset-11/root/usr/bin/gcc /usr/bin/gcc && \
-        ln -s /opt/rh/devtoolset-11/root/usr/bin/g++ /usr/bin/g++ && \
-        ln -s /opt/rh/devtoolset-11/root/usr/bin/cpp /usr/bin/cpp && \
-        ln -s /opt/rh/devtoolset-11/root/usr/bin/gfortran /usr/bin/gfortran && \
-        ln -s /opt/rh/devtoolset-11/root/usr/bin/make /usr/bin/make && \
+		ln -s /opt/rh/gcc-toolset-11/root/usr/bin/gcc /usr/bin/gcc && \
+		ln -s /opt/rh/gcc-toolset-11/root/usr/bin/g++ /usr/bin/g++ && \
+        ln -s /opt/rh/gcc-toolset-11/root/usr/bin/cpp /usr/bin/cpp && \
+        ln -s /opt/rh/gcc-toolset-11/root/usr/bin/gfortran /usr/bin/gfortran && \
+        ln -s /opt/rh/gcc-toolset-11/root/usr/bin/make /usr/bin/make && \
 		gcc -v && \
 		make -v && \
         yum config-manager --set-enabled powertools; \
