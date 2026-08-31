@@ -241,10 +241,10 @@ jobs:
           sudo timedatectl set-timezone Asia/Shanghai
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             export build_timestamp="$(date +'%Y%m%d_%H%M')"
-            TAG="OpenSSH_${OPENSSHVER}_${build_timestamp}"
+            TAG="${OPENSSHVER}_${build_timestamp}"
             echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           else
-            TAG="OpenSSH_${{ github.ref_name }}_${build_timestamp}"
+            TAG="${{ github.ref_name }}_${build_timestamp}"
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
           mkdir -p release-assets
