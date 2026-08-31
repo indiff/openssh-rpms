@@ -260,15 +260,15 @@ jobs:
           cat <<'EOF' >> ${GITHUB_WORKSPACE}/RELEASE.md
           # Proxy download:
           ```bash
-          curl -#Lo openssh-indiff.zip "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip" --insecure
+          curl -#Lo openssh-indiff.zip "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/shitver_shitstamp/openssh_shitver_shitstamp_rpm-el7-x86_64.zip" --insecure
           ```
           ```bash
-          wget --no-check-certificate "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip" -O openssh-indiff.zip 
+          wget --no-check-certificate "https://ghfast.top/https://github.com/indiff/openssh-rpms/releases/download/shitver_shitstamp/openssh_shitver_shitstamp_rpm-el7-x86_64.zip" -O openssh-indiff.zip 
           ```
             
           # Direct download:
           ```bash         
-          curl -#Lo openssh-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/OpenSSH_shitver_shitstamp/openssh_el7_shitstamp.x86_64.zip"
+          curl -#Lo openssh-indiff.zip "https://github.com/indiff/openssh-rpms/releases/download/shitver_shitstamp/openssh_shitver_shitstamp_rpm-el7-x86_64.zip"
           ```
 
           ```
@@ -330,7 +330,7 @@ jobs:
           sed -i "s/shitstamp/${build_timestamp}/g" RELEASE.md
           sed -i 's/shitshit/EOF/g' RELEASE.md
           GITHUB_REF=${{ github.ref }}
-          TAGNAME="OpenSSH_${OPENSSHVER}_${build_timestamp}"
+          TAGNAME="${OPENSSHVER}_${build_timestamp}"
           NAME="${TAGNAME}"
           git tag -l --format='%(contents)' "${TAGNAME}" | tee -a ${GITHUB_WORKSPACE}/RELEASE.md
           gh release delete --cleanup-tag --yes "$TAGNAME" || true
