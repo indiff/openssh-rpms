@@ -76,7 +76,6 @@ RUN export MIRROR="$MIRROR" && \
             ln -s /opt/gcc-indff/bin/cpp /usr/bin/cpp && \
             ln -s /opt/gcc-indff/bin/ld /usr/bin/ld && \
             export CC=/opt/gcc-indff/bin/gcc && \
-            /opt/gcc-indff/bin/gcc -v; \
         else \
             echo "Skipping x86_64-specific commands on $(uname -m) architecture"; \
         fi  && \
