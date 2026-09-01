@@ -227,9 +227,9 @@ else
     echo "version.h not found"
 fi
 
-# 判断 indiff-gcc 文件是否存在
-if [ -f /opt/indiff-gcc/bin/gcc ]; then
-    CC=/opt/indiff-gcc/bin/gcc
+# 判断 gcc-indiff 文件是否存在
+if [ -f /opt/gcc-indiff/bin/gcc ]; then
+    CC=/opt/gcc-indiff/bin/gcc
     echo "version.h not found"
 fi
 
