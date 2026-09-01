@@ -68,7 +68,7 @@ RUN export MIRROR="$MIRROR" && \
             curl -sLo /opt/gcc-indff.zip https://github.com/indiff/gcc-build/releases/download/20260901_1142_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260901_1051.xz && \
             unzip /opt/gcc-indff.zip -d /opt/gcc-indff && \
             rm -f /opt/gcc-indff.zip && \
-            cd /opt/gcc-indff && ln -sf libzstd.so.1.5.8 libzstd.so.1 && ln -sf libzstd.so.1.5.8 libzstd.so && ldconfig /opt/gcc-indiff/lib && \
+            cd /opt/gcc-indff/lib && ln -sf libzstd.so.1.5.8 libzstd.so.1 && ln -sf libzstd.so.1.5.8 libzstd.so && ldconfig /opt/gcc-indiff/lib && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
