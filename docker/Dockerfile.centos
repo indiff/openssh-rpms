@@ -65,18 +65,19 @@ RUN export MIRROR="$MIRROR" && \
             yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
             yum -y install git && \
             git --version && \
-            curl -sLo /opt/indiff-gcc.zip https://github.com/indiff/gcc-build/releases/download/20260901_1142_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260901_1051.xz && \
-            unzip /opt/indiff-gcc.zip -d /opt/indiff-gcc && \
-            rm -f opt/indiff-gcc.zip && \
+            curl -sLo /opt/gcc-indff.zip https://github.com/indiff/gcc-build/releases/download/20260901_1142_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260901_1051.xz && \
+            unzip /opt/gcc-indff.zip -d /opt/gcc-indff && \
+            rm -f /opt/gcc-indff.zip && \
+            cd /opt/gcc-indff && ln -sf libzstd.so.1.5.8 libzstd.so.1 && ln -sf libzstd.so.1.5.8 libzstd.so && ldconfig /opt/gcc-indiff/lib && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
             rm -f /usr/bin/ld && \
-            ln -s /opt/indiff-gcc/bin/gcc /usr/bin/gcc && \
-            ln -s /opt/indiff-gcc/bin/g++ /usr/bin/g++ && \
-            ln -s /opt/indiff-gcc/bin/cpp /usr/bin/cpp && \
-            ln -s /opt/indiff-gcc/bin/ld /usr/bin/ld && \
-            export CC=/opt/indiff-gcc/bin/gcc && \
+            ln -s /opt/gcc-indff/bin/gcc /usr/bin/gcc && \
+            ln -s /opt/gcc-indff/bin/g++ /usr/bin/g++ && \
+            ln -s /opt/gcc-indff/bin/cpp /usr/bin/cpp && \
+            ln -s /opt/gcc-indff/bin/ld /usr/bin/ld && \
+            export CC=/opt/gcc-indff/bin/gcc && \
             /opt/indiff-gcc/bin/gcc -v; \
         else \
             echo "Skipping x86_64-specific commands on $(uname -m) architecture"; \
