@@ -65,10 +65,7 @@ RUN export MIRROR="$MIRROR" && \
             yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
             yum -y install git && \
             git --version && \
-            curl -sLo /opt/gcc-indff.zip https://github.com/indiff/gcc-build/releases/download/20260901_1142_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260901_1051.xz && \
-            unzip /opt/gcc-indff.zip -d /opt/gcc-indff && \
-            rm -f /opt/gcc-indff.zip && rm -f /opt/gcc-indff/lib/ibzstd.so.1 /opt/gcc-indff/lib/ibzstd.so \
-            cd /opt/gcc-indff/lib && ln -sf libzstd.so.1.5.8 libzstd.so.1 && ln -sf libzstd.so.1.5.8 libzstd.so && ldconfig /opt/gcc-indiff/lib && \
+            curl -sLo /opt/gcc-indff.zip https://github.com/indiff/gcc-build/releases/download/20260723_1241_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260723_1218.xz && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
