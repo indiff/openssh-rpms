@@ -66,6 +66,7 @@ RUN export MIRROR="$MIRROR" && \
             yum -y install git && \
             git --version && \
             curl -sLo /opt/gcc-indff.zip https://github.com/indiff/gcc-build/releases/download/20260723_1241_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260723_1218.xz && \
+            unzip /opt/gcc-indff.zip -d /opt/gcc-indiff && rm -f /opt/gcc-indff.zip && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
