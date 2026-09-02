@@ -37,6 +37,73 @@ if [ -f /opt/gcc-indiff/bin/gcc ]; then
     echo "version.h not found"
 fi
 
+
+yum install -y systemd-devel libgudev1 libgudev1-devel || true
+yum install -y epel-release || true
+yum install -y texinfo help2man patch autoconf autoconf-archive icu wget automake libtool m4 pkgconfig
+
+export CC="/opt/gcc-indiff/bin/gcc"
+export CXX="/opt/gcc-indiff/bin/g++"
+export ACLOCAL_PATH=/usr/share/aclocal:${ACLOCAL_PATH:-}
+
+cd /opt
+# autoconf from source
+git clone https://github.com/autotools-mirror/autoconf.git
+cd autoconf
+./bootstrap     # if exists
+./configure --prefix=/usr
+make -j$(nproc)
+make install
+cd ..
+
+function wget_gnu(){
+     local suffix=$1
+     wget https://ftp.gnu.org/gnu/$suffix || wget https://mirrors.aliyun.com/gnu/$suffix || wget http://mirrors.tencent.com/gnu/$suffix
+}
+
+pkg-config --version || true
+
+# pkg-config from source
+wget https://pkgconfig.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+tar xzf pkg-config-0.29.2.tar.gz
+cd pkg-config-0.29.2
+./configure --prefix=/usr --with-internal-glib
+make CFLAGS="-Ubool -std=gnu11 -O2" -j$(nproc)
+make install
+pkg-config --version
+cd ..
+
+# automake from source
+wget_gnu automake/automake-1.18.1.tar.gz
+tar -xzf automake-1.18.1.tar.gz
+cd automake-1.18.1
+./bootstrap     # if exists
+./configure --prefix=/usr
+make -j$(nproc)
+make install
+cd ..
+
+# libtool from source
+wget_gnu libtool/libtool-2.6.2.tar.gz
+tar -xzf libtool-2.6.2.tar.gz
+cd libtool-2.6.2
+./bootstrap  --force     # if exists
+./configure --prefix=/usr
+make -j$(nproc)
+make install
+cd ..
+
+# m4 from source
+wget_gnu m4/m4-latest.tar.gz
+tar -xzf m4-latest.tar.gz
+cd m4-*
+env CC=/opt/gcc-indiff/bin/gcc CFLAGS="-I/opt/gcc-indiff/include " \
+./configure --prefix=/usr
+make -j$(nproc)
+make install
+cd ..
+m4 --version
+
 git clone --filter=blob:none --depth 1 https://github.com/microsoft/vcpkg.git /opt/vcpkg
 /opt/vcpkg/bootstrap-vcpkg.sh
 export VCPKG_ROOT=/opt/vcpkg
