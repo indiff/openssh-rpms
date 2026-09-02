@@ -69,6 +69,7 @@ RUN export MIRROR="$MIRROR" && \
             unzip /opt/gcc-indiff.zip -d /opt/gcc-indiff && rm -f /opt/gcc-indiff.zip && \
             rm -f /opt/gcc-indiff/lib/libzstd.so && rm -f /opt/gcc-indiff/lib/libzstd.so.1 && \
             cd /opt/gcc-indiff/lib && ln -sf libzstd.so.1.5.8 libzstd.so && ln -sf libzstd.so.1.5.8 libzstd.so.1 && \
+            ldconfig /opt/gcc-indiff/lib && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
