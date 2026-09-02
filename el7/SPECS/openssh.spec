@@ -212,9 +212,7 @@ after_dot=$(echo "%{version}" | awk -F'.' '{print $2}' | sed 's/[^0-9]//g')
 current_date=$(date +%Y%m%d)
 obfuscated_version="${before_dot}${current_date}.${after_dot}${current_date}"
 
-# check gcc version
-gcc -v
-make -v
+
 
 # 判断 version.h 文件是否存在
 if [ -f version.h ]; then
@@ -231,8 +229,18 @@ fi
 if [ -f /opt/gcc-indiff/bin/gcc ]; then
     CC=/opt/gcc-indiff/bin/gcc
     CXX=/opt/gcc-indiff/bin/g++
+	if [ -f /opt/gcc-indiff/lib/libzstd.so.1.5.8 ]; then
+		rm -f /opt/gcc-indiff/lib/libzstd.so
+		rm -f /opt/gcc-indiff/lib/libzstd.so.1
+		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so
+		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so.1
+	fi
     echo "version.h not found"
 fi
+
+# check gcc version
+gcc -v
+make -v
 
 # Add content below to use source code of OpenSSL
 %define openssl_dir %{_builddir}/%{name}-%{version}/openssl
