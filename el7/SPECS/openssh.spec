@@ -10,6 +10,11 @@
 %global ver %{?opensshver}
 %global rel %{?opensshpkgrel}%{?dist}
 
+# ============================================================
+%global vcpkg_root      /opt/vcpkg
+%global vcpkg_triplet   x64-linux-dynamic
+%global vcpkg_installed /opt/vcpkg/installed/x64-linux-dynamic
+
 # OpenSSH privilege separation requires a user & group ID
 %global sshd_uid    74
 %global sshd_gid    74
@@ -262,7 +267,18 @@ CFLAGS="$RPM_OPT_FLAGS -Os"; export CFLAGS
 # Add OpenSSL library
 export LD_LIBRARY_PATH="%{openssl_dir}"
 %endif
+
+export PKG_CONFIG_PATH="%{vcpkg_installed}/lib/pkgconfig:%{vcpkg_installed}/share/pkgconfig:${PKG_CONFIG_PATH:-}"
+export CFLAGS="-I%{vcpkg_installed}/include ${CFLAGS:-}"
+export LDFLAGS="-L%{vcpkg_installed}/lib -Wl,-rpath,%{vcpkg_installed}/lib ${LDFLAGS:-}"
+export X_CFLAGS="-I%{vcpkg_installed}/include"
+export X_LIBS="-L%{vcpkg_installed}/lib -lX11 -lSM -lICE -lXt -lXau -lXdmcp"
+export X_EXTRA_LIBS="-lpthread -ldl"
+
 %configure \
+	--with-x \
+    --x-includes=%{vcpkg_installed}/include \
+    --x-libraries=%{vcpkg_installed}/lib \
 	--sysconfdir=%{_sysconfdir}/ssh \
 	--libexecdir=%{_libexecdir}/openssh \
 	--datadir=%{_datadir}/openssh \
