@@ -1,5 +1,16 @@
 #!/bin/bash
 if grep -q "release 7" /etc/redhat-release 2>/dev/null && [ "$(uname -m)" = "x86_64" ]; then
+# ============================================================================
+# Upgrade python
+# ============================================================================
+yum -y remove python36 python36-pip python36-devel python3 python3-pip python3-devel
+yum -y install yum-plugin-copr
+yum -y copr enable adrienverge/python37
+yum -y install python37 python37-devel python37-pip
+python3 --version
+# ============================================================================
+# Upgrade git
+# ============================================================================
 yum -y remove git
 yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
 yum -y install git
