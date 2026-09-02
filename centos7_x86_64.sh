@@ -192,17 +192,6 @@ export LDFLAGS="-L${VCPKG_INSTALL}/lib"
 export LD_LIBRARY_PATH="${VCPKG_INSTALL}/lib"
 
 
-wget https://thrysoee.dk/editline/libedit-20260512-3.1.tar.gz
-tar -xzf libedit-20260512-3.1.tar.gz
-cd libedit-20260512-3.1
-
-./configure \
-    --prefix=/opt/vcpkg/installed/x64-linux-dynamic \
-    --enable-shared \
-    --enable-static
-
-CC=/opt/gcc-indiff/bin/gcc CXX=/opt/gcc-indiff/bin/g++ make -j$(nproc)
-make install
 
 fi
 
