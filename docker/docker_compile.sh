@@ -1,6 +1,5 @@
 #!/bin/bash
-
-if [[ "$VERSION_NUM" == "7" && "$(uname -m)" == "x86_64" ]]; then
+if grep -q "release 7" /etc/redhat-release 2>/dev/null && [ "$(uname -m)" = "x86_64" ]; then
 yum -y remove git
 yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
 yum -y install git
