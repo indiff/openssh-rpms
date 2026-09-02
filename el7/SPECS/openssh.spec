@@ -234,6 +234,7 @@ if [ -f /opt/gcc-indiff/bin/gcc ]; then
 		rm -f /opt/gcc-indiff/lib/libzstd.so.1
 		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so
 		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so.1
+		ldconfig /opt/gcc-indiff/lib
 	fi
     echo "version.h not found"
 fi
