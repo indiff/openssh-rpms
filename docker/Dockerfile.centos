@@ -47,7 +47,7 @@ RUN export MIRROR="$MIRROR" && \
         scl enable devtoolset-12 bash && \
         source /opt/rh/devtoolset-12/enable && \
         echo "source /opt/rh/devtoolset-12/enable" >> ~/.bash_profile && \
-        echo "export PATH=/opt/rh/devtoolset-12/root/bin:$PATH" >> ~/.bash_profile && \
+        echo "export PATH=/opt/rh/devtoolset-9/root/bin:$PATH" >> ~/.bash_profile && \
         export PATH=/opt/rh/devtoolset-12/root/bin:$PATH && \
         rm -rf /usr/libexec/gcc/x86_64-redhat-linux && \
         rm -f /usr/bin/gcc && \
@@ -65,8 +65,10 @@ RUN export MIRROR="$MIRROR" && \
             yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
             yum -y install git && \
             git --version && \
-            curl -sLo /opt/gcc-indiff.zip https://github.com/indiff/gcc-build/releases/download/20260723_1241_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260723_1218.xz && \
+            curl -sLo /opt/gcc-indiff.zip https://github.com/indiff/gcc-build/releases/download/20260901_1534_17.0.0/gcc-indiff-centos7-17.0.0-x86_64-20260901_1317.xz && \
             unzip /opt/gcc-indiff.zip -d /opt/gcc-indiff && rm -f /opt/gcc-indiff.zip && \
+            rm -f /opt/gcc-indiff/lib/libzstd.so && rm -f /opt/gcc-indiff/lib/libzstd.so.1 && \
+            cd /opt/gcc-indiff/lib && ln -sf libzstd.so.1.5.8 libzstd.so && ln -sf libzstd.so.1.5.8 libzstd.so.1 && \
             rm -f /usr/bin/gcc && \
             rm -f /usr/bin/g++ && \
             rm -f /usr/bin/cpp && \
