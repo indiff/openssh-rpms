@@ -230,6 +230,7 @@ fi
 # 判断 gcc-indiff 文件是否存在
 if [ -f /opt/gcc-indiff/bin/gcc ]; then
     CC=/opt/gcc-indiff/bin/gcc
+    CXX=/opt/gcc-indiff/bin/g++
     echo "version.h not found"
 fi
 
@@ -277,7 +278,7 @@ export LD_LIBRARY_PATH="%{openssl_dir}"
 	--with-pam \
 %endif
 %if %{kerberos5}
-	 --with-kerberos5 \
+	--with-kerberos5 \
 %endif
 
 
@@ -332,6 +333,11 @@ PermitRootLogin yes
 PasswordAuthentication yes
 UseDNS no
 UsePAM yes
+TCPKeepAlive yes
+ClientAliveInterval 60
+ClientAliveCountMax 3
+#Subsystem sftp  internal-sftp
+Subsystem sftp  /usr/libexec/openssh/sftp-server
 KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group1-sha256,diffie-hellman-group14-sha1,diffie-hellman-group14-sha256,diffie-hellman-group15-sha256,diffie-hellman-group15-sha512,diffie-hellman-group16-sha256,diffie-hellman-group16-sha512,diffie-hellman-group17-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha512
 EOF
 %if %{with_openssl} > 0
