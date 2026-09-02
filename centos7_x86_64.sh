@@ -174,8 +174,22 @@ cd ..
 m4 --version
 
 CC=/opt/gcc-indiff/bin/gcc CXX=/opt/gcc-indiff/bin/g++ $VCPKG_ROOT/vcpkg install \
-            libice libsm libx11 libxt zlib libedit \
+            libice libsm libx11 libxt zlib ncurses \
             --triplet x64-linux-dynamic --clean-after-build \
             || cat /workspace/vcpkg/installed/vcpkg/issue_body.md
+
+cd /tmp
+wget https://thrysoee.dk/editline/libedit-20260512-3.1.tar.gz
+tar -xzf libedit-20260512-3.1.tar.gz
+cd libedit-20260512-3.1
+
+./configure \
+    --prefix=/opt/vcpkg/installed/x64-linux-dynamic \
+    --enable-shared \
+    --enable-static
+
+make -j$(nproc)
+make install
+
 fi
 
