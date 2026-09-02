@@ -178,7 +178,20 @@ CC=/opt/gcc-indiff/bin/gcc CXX=/opt/gcc-indiff/bin/g++ $VCPKG_ROOT/vcpkg install
             --triplet x64-linux-dynamic --clean-after-build \
             || cat /workspace/vcpkg/installed/vcpkg/issue_body.md
 
+
+
 cd /tmp
+
+# vcpkg输出目录，替换为你实际路径
+VCPKG_INSTALL=/opt/vcpkg/installed/x64-linux-dynamic
+
+export PKG_CONFIG_PATH="${VCPKG_INSTALL}/lib/pkgconfig"
+export CPPFLAGS="-I${VCPKG_INSTALL}/include"
+export CFLAGS="-I${VCPKG_INSTALL}/include"
+export LDFLAGS="-L${VCPKG_INSTALL}/lib"
+export LD_LIBRARY_PATH="${VCPKG_INSTALL}/lib"
+
+
 wget https://thrysoee.dk/editline/libedit-20260512-3.1.tar.gz
 tar -xzf libedit-20260512-3.1.tar.gz
 cd libedit-20260512-3.1
