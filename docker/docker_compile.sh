@@ -12,6 +12,21 @@ tar -xzf cmake3.tar.gz
 mv cmake-4.4.0-linux-x86_64 /opt/cmake
 rm -f /usr/bin/cmake
 ln -sf /opt/cmake/bin/cmake /usr/bin/cmake
+
+# 判断 gcc-indiff 文件是否存在
+if [ -f /opt/gcc-indiff/bin/gcc ]; then
+    CC=/opt/gcc-indiff/bin/gcc
+    CXX=/opt/gcc-indiff/bin/g++
+	if [ -f /opt/gcc-indiff/lib/libzstd.so.1.5.8 ]; then
+		rm -f /opt/gcc-indiff/lib/libzstd.so
+		rm -f /opt/gcc-indiff/lib/libzstd.so.1
+		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so
+		ln -sf /opt/gcc-indiff/lib/libzstd.so.1.5.8 /opt/gcc-indiff/lib/libzstd.so.1
+		ldconfig /opt/gcc-indiff/lib
+	fi
+    echo "version.h not found"
+fi
+
 git clone --filter=blob:none --depth 1 https://github.com/microsoft/vcpkg.git /opt/vcpkg
 /opt/vcpkg/bootstrap-vcpkg.sh
 export VCPKG_ROOT=/opt/vcpkg
