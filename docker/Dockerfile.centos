@@ -121,4 +121,12 @@ RUN export MIRROR="$MIRROR" && \
     yum clean all && \
     rm -rfv /data/
 
+# Copy dependency installation script
+COPY centos7_x86_64.sh /tmp/centos7_x86_64.sh
+
+# Run the installation script
+RUN chmod +x /tmp/centos7_x86_64.sh && \
+    /tmp/centos7_x86_64.sh && \
+    rm -f /tmp/centos7_x86_64.sh
+
 CMD ["./docker/docker_compile.sh"]
