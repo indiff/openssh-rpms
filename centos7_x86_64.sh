@@ -201,7 +201,7 @@ cd libedit-20260512-3.1
     --enable-shared \
     --enable-static
 
-make -j$(nproc)
+CC=/opt/gcc-indiff/bin/gcc CXX=/opt/gcc-indiff/bin/g++ make -j$(nproc)
 make install
 
 fi
