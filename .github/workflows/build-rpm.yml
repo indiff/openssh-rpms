@@ -306,6 +306,7 @@ jobs:
 
           # Restart service
           service sshd restart
+          systemctl restart sshd
           ```
 
           ```
