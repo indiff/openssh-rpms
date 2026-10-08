@@ -6,7 +6,7 @@ Similar Project: [Backport OpenSSH for Debian / Ubuntu distros](https://github.c
 
 ## Supported (tested) Distro:
 
-| Distro         | Version        | Arch                | Recommanded EL RPMs                                                  |
+| Distro         | Version        | Arch                | Recommended EL RPMs                                                  |
 |----------------|----------------|---------------------|----------------------------------------------------------------------|
 | CentOS          | 5               | x86_64 / i686        | EL 5 (`rpm-el5-x86_64`, `rpm-el5-i686`)              |
 | CentOS          | 6               | x86_64               | EL 6 (`rpm-el6-x86_64`)                              |
@@ -16,6 +16,11 @@ Similar Project: [Backport OpenSSH for Debian / Ubuntu distros](https://github.c
 | CentOS Stream   | 9               | x86_64 / aarch64     | EL 9 (`rpm-el9-x86_64`, `rpm-el9-aarch64`)           |
 | Rocky Linux     | 8               | x86_64 / aarch64     | EL 8 (`rpm-el8-x86_64`, `rpm-el8-aarch64`)           |
 | Rocky Linux     | 9               | x86_64 / aarch64     | EL 9 (`rpm-el9-x86_64`, `rpm-el9-aarch64`)           |
+| AlmaLinux       | 8               | x86_64 / aarch64     | EL 8 (`rpm-el8-x86_64`, `rpm-el8-aarch64`)           |
+| AlmaLinux       | 9               | x86_64 / aarch64     | EL 9 (`rpm-el9-x86_64`, `rpm-el9-aarch64`)           |
+| Oracle Linux    | 7               | x86_64 / aarch64     | EL 7 (`rpm-el7-x86_64`, `rpm-el7-aarch64`)           |
+| Oracle Linux    | 8               | x86_64 / aarch64     | EL 8 (`rpm-el8-x86_64`, `rpm-el8-aarch64`)           |
+| Oracle Linux    | 9               | x86_64 / aarch64     | EL 9 (`rpm-el9-x86_64`, `rpm-el9-aarch64`)           |
 | Amazon Linux    | 1               | x86_64               | EL 6 (`rpm-el6-x86_64`)                              |
 | Amazon Linux    | 2               | x86_64 / aarch64     | EL 7 (`rpm-el7-x86_64`, `rpm-el7-aarch64`)           |
 | Amazon Linux    | 2023            | x86_64 / aarch64     | EL 9 (`rpm-el9-x86_64`, `rpm-el9-aarch64`)           |
@@ -45,8 +50,8 @@ The directory (`el5`, `el6`, `el7`) serve as functional templates for different 
 
 ## Current Version:
 
-- OpenSSH 10.5p1 (see: [OpenSSH Official](https://www.openssh.com/))
-- OpenSSL 3.5.8 (see: [OpenSSL Official](https://openssl-library.org/source/))
+- OpenSSH 10.6p1 (see: [OpenSSH Official](https://www.openssh.com/))
+- OpenSSL 3.5.9 (see: [OpenSSL Official](https://openssl-library.org/source/))
 
 The build script reads `version.env` for version definitions.
 
@@ -64,28 +69,31 @@ yum install -y systemd-devel
 yum install -y gcc44
 ```
 
+`libXt-devel`, `libX11-devel` and `gtk2-devel` are only relevant to the EL6/EL7-era askpass subpackages — the EL8+ spec skips them (`compile.sh` passes `no_gtk2` / `skip_gnome_askpass` / `skip_x11_askpass = 1`) and the centos-stream Dockerfile doesn't install them.
+
 ## Usage
 
 ### Download RPMs
 
-You can download the needed RPMs from the GitHub Release using the GitHub
-API. The script below auto-detects your architecture and EL version from
-the running system, then fetches the matching asset from the latest
-release.
+Go to the [Releases page](https://github.com/boypt/openssh-rpms/releases)
+and download the zip file that matches your system. No script or GitHub
+API needed.
+
+Each release provides one zip per tag, named like:
+
+```
+openssh_<version>_<tag>.zip
+```
+
+e.g. `openssh_v10.5p1_b1_rpm-el8-x86_64.zip`.
+
+1. Find your distro in the "Supported (tested) Distro" table above, and
+   note the tag in the "Recommended EL RPMs" column (e.g. `rpm-el8-x86_64`).
+2. Download the zip whose name ends with that tag.
+3. Unzip it and install:
 
 ```bash
-ARCH=$(uname -m)
-# Read the system's own rpm dist tag (.el8 -> el8, .el7 -> el7, ...).
-# Override for non-elN dists (e.g. UOS 20) or when auto-detect fails.
-# If unsure which EL value to use, see the "Supported (tested) Distro"
-# table at the top of this README.
-EL=$(rpm --eval '%{?dist}' 2>/dev/null | grep -oE 'el[0-9]+' | head -1)
-[[ -z "$EL" ]] && EL=el7
-
-curl -s https://api.github.com/repos/boypt/openssh-rpms/releases/latest \
-| jq -r --arg el "$EL" --arg arch "$ARCH" \
-    '.assets[] | select(.name | ascii_downcase | contains($el) and contains($arch)) | .browser_download_url' \
-| wget -i - --show-progress -c
+unzip openssh*.zip
 ```
 
 ### Build RPMs
@@ -105,6 +113,10 @@ Note: It is unnecessary to build on each system, as most RPM-based Linux distrib
     ```
 5. The generated RPM files will be copied to the `output` directory.
 
+#### Use Docker
+
+For more details, see [docker/README.md](docker/README.md)
+
 ### Install RPMs
 
 ```bash
@@ -112,25 +124,37 @@ ls output
 # you will find multiple RPM files in this directory.
 # you may copy them to other machines, and continue following steps there.
 
-# Backup current SSH config
+# Backup current SSH config by moving it away — the new package then
+# lays down a fresh stock config, which also avoids breakage from old
+# directives (notably the GSSAPI* series) removed upstream.
 [[ -f /etc/ssh/sshd_config ]] && mv /etc/ssh/sshd_config /etc/ssh/sshd_config.$(date +%Y%m%d)
 
-# Install rpm packages.
+# Install rpm packages (`dnf` works the same on EL8/EL9).
 sudo yum --disablerepo=* localinstall -y ./openssh*.rpm
 
 # Check Installed version:
 ssh -V && /usr/sbin/sshd -V
 
+# If you skipped the backup step above, rpm kept your old config and
+# saved the package defaults as sshd_config.rpmnew (the spec marks it
+# %config(noreplace)). An old config can keep the new sshd from
+# starting, so test it — on failure either fix the offending
+# directives, or swap in the .rpmnew defaults, then re-test until it
+# passes silently:
+ls /etc/ssh/sshd_config.rpmnew
+sudo /usr/sbin/sshd -t -f /etc/ssh/sshd_config || sudo mv /etc/ssh/sshd_config{.rpmnew,}
+sudo /usr/sbin/sshd -t -f /etc/ssh/sshd_config
+
 # Restart service
-sudo service sshd restart
+sudo systemctl restart sshd   # (`service sshd restart` also works)
 
 # Test a new ssh connection
 ssh localhost
 ```
 
-**DO NOT DISCONNECET** current ssh shell yet, open a **NEW** shell and login to you machine to verify that sshd is working properly.
+**DO NOT DISCONNECT** current ssh shell yet, open a **NEW** shell and login to you machine to verify that sshd is working properly.
 
-#### Trouble shooting
+#### Troubleshooting
 
 You may get complains during the `yum localinstall` process. It's mostly because some subpackages depend on the main openssh package, upgrading only the main package won't fit in their dependencies.
 
@@ -146,9 +170,42 @@ If still not satisfied, you may try the final weapon: FORCED INSTALL.
 rpm -ivh --force --nodeps --replacepkgs --replacefiles openssh-*.rpm
 ```
 
-## Use Docker
+### Rollback to distro stock OpenSSH
 
-For more details, see [docker/README.md](docker/README.md)
+If the custom build doesn't work for you, remove it and reinstall the
+version shipped by your distro. Keep your current SSH session open until
+the rollback is verified.
+
+```bash
+# 1. Downgrade back to the distro's own versions in one yum transaction.
+# (Single yum transaction -> dependencies are handled properly and there
+# is no "RPMDB altered outside of yum" warning afterwards. If you
+# installed extra subpackages, list them here too.)
+sudo yum downgrade openssh openssh-clients openssh-server
+# On EL8/EL9, `dnf` works the same.
+
+# Fallback if downgrade is unavailable: erase first, then reinstall
+# from the distro repos (re-enable the repos if you disabled them).
+sudo rpm -e --nodeps openssh openssh-clients openssh-server
+sudo yum install -y openssh openssh-clients openssh-server
+
+# 2. Restart and verify
+sudo systemctl restart sshd   # EL7 and above (systemd)
+# sudo service sshd restart   # EL5/EL6 (SysVinit)
+ssh -V && /usr/sbin/sshd -V
+ssh localhost
+```
+
+Notes:
+
+- The default build bundles OpenSSL statically (`WITH_OPENSSL=2`), so
+  the system OpenSSL is untouched — only the `openssh` packages need
+  rolling back.
+- If the downgrade/install step can't find the packages, your base repos may be disabled or
+  (on EOL releases like EL5/EL6) moved to vault — fix the repo config
+  first.
+- Same rule as install: **DO NOT** close your current shell, open a
+  **NEW** shell to verify that login works before disconnecting.
 
 ## Other Notes
 
@@ -183,7 +240,7 @@ unaffected. For the Docker-based build, see
 
 ### Install on uniontech UOS 20
 
-UOS's `openssh-help` subpackage has files that confilict with the package. It's must be removed before installing the compiled RPMs:
+UOS's `openssh-help` subpackage has files that conflict with the package. It's must be removed before installing the compiled RPMs:
 
 ```bash
 sudo rpm --nodeps -e openssh-help

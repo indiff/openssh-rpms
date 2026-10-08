@@ -234,7 +234,7 @@ jobs:
           echo "Downloaded artifact directories:"
           find artifacts -mindepth 1 -maxdepth 1 -type d
 
-      - name: Repackage artifacts and release
+      - name: Repackage artifacts with prefixed names
         id: repackage
         run: |
           source version.env
