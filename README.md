@@ -170,6 +170,28 @@ If still not satisfied, you may try the final weapon: FORCED INSTALL.
 rpm -ivh --force --nodeps --replacepkgs --replacefiles openssh-*.rpm
 ```
 
+#### Retained `sshd_config` and `/etc/ssh/sshd_config.d/` drop-ins
+
+Legacy `/etc/ssh/sshd_config` files on many systems do not explicitly include
+uncommented `PasswordAuthentication yes` or `PermitRootLogin yes` lines. Because
+`/etc/ssh/sshd_config` is marked `%config(noreplace)`, `yum`/`rpm` preserves a
+user-modified `sshd_config` during upgrades and writes the package's template to
+`/etc/ssh/sshd_config.rpmnew`.
+
+To prevent root password login from breaking on upgrade while preserving your
+custom `sshd_config`, the package's `%post` script:
+1. Ensures `Include /etc/ssh/sshd_config.d/*.conf` is present in `/etc/ssh/sshd_config`.
+2. Checks whether `PermitRootLogin`, `PasswordAuthentication`, and `UsePAM` are
+   explicitly configured; any missing (or commented-out) directive is written to
+   `/etc/ssh/sshd_config.d/99-elssh-defaults.conf`.
+
+If you want to customize these settings, either edit `/etc/ssh/sshd_config` or
+adjust `/etc/ssh/sshd_config.d/99-elssh-defaults.conf`, then verify and restart:
+
+```bash
+sudo /usr/sbin/sshd -t -f /etc/ssh/sshd_config && sudo systemctl restart sshd
+```
+
 ### Rollback to distro stock OpenSSH
 
 If the custom build doesn't work for you, remove it and reinstall the
