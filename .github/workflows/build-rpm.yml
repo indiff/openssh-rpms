@@ -43,6 +43,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Set normalized GHCR image name
+        id: image-name
+        run: |
+          image_name=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          echo "value=$image_name" >> "$GITHUB_OUTPUT"
+
       - name: Run pullsrc.sh
         run: env ALL=1 ./pullsrc.sh
 
@@ -73,12 +79,12 @@ jobs:
           docker run --rm \
             -v $(pwd):/data \
             -e "UOS20=${{ matrix.uos20 }}" \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.tag }}
+            ${{ env.REGISTRY }}/${{ steps.image-name.outputs.value }}:${{ matrix.tag }}
 
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: rpm-el${{ matrix.el }}-${{ matrix.arch }}
+          name: ${{ matrix.artifact }}
           path: output/*.rpm
           if-no-files-found: ignore
 
@@ -119,6 +125,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Set normalized GHCR image name
+        id: image-name
+        run: |
+          image_name=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          echo "value=$image_name" >> "$GITHUB_OUTPUT"
+
       - name: Run pullsrc.sh
         run: ./pullsrc.sh
 
@@ -146,7 +158,7 @@ jobs:
           docker run --rm \
             -v $(pwd):/data \
             -e "UOS20=${{ matrix.uos20 }}" \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.tag }}
+            ${{ env.REGISTRY }}/${{ steps.image-name.outputs.value }}:${{ matrix.tag }}
 
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v7
@@ -180,6 +192,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Set normalized GHCR image name
+        id: image-name
+        run: |
+          image_name=$(printf '%s' "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          echo "value=$image_name" >> "$GITHUB_OUTPUT"
+
       - name: Run pullsrc.sh
         run: ./pullsrc.sh
 
@@ -206,12 +224,12 @@ jobs:
           docker run --rm \
             -v $(pwd):/data \
             -e "M32=${{ matrix.m32 }}" \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:el5
+            ${{ env.REGISTRY }}/${{ steps.image-name.outputs.value }}:el5
 
       - name: Upload RPM artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: rpm-el${{ matrix.el }}-${{ matrix.arch }}
+          name: ${{ matrix.artifact }}
           path: output/*.rpm
           if-no-files-found: error
 
